@@ -2,113 +2,103 @@
 #include "hman.h"
 
 
-struct node;
+struct enode;
+struct dnode;
 
 typedef unsigned char uchar;
 typedef unsigned long long ull;
-typedef node* xnode;
+typedef dnode* dxnode; //for decoding
+typedef enode* exnode; //for encoding
 
-/**
-    @brief
-        Symbol-frequency map function
-    @param data_buffer
-        Input data to catalogue
-    @param data_len
-        Length of the input data buffer
-    @param symbol_buffer
-        Pre-allocated 256B output buffer for unique symbols occuring in the data_buffer.
-        The symbols will be stored at the beginning of the buffer
-    @param freq_buffer
-        Pre-allocated 256*8B output buffer for storing the number of occurences of the unique symbols
-        in the input data buffer
-    @param uniq_symbol_cnt
-        Number of unique symbols detected in the input data buffer. Each symbol has size of 1B.
 
-*/
-void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_buffer, ull* freq_buffer, uchar& uniq_symbol_cnt){
-    uchar* dhead = data_buffer;
-    uchar* dtail = data_buffer+data_len;
-    ull* fhead = freq_buffer;
-    ull* ftail = freq_buffer+0x100;
 
-    while(fhead != ftail){
-        *fhead++ = 0x0;
-    }
-    while(dhead != dtail){
+dxnode* min_dxnode(dxnode* buffer, uchar len){
+    dxnode* _min_dxnode;
+    dxnode* _head_dxnode = buffer;
+    dxnode* _tail_dxnode = buffer+len;
 
-        // *(freq_buffer+*dhead++)++; // MinGW g++ tak nie pozwala
-        ++*(freq_buffer+*dhead++);    // a tak pozwala
-
-    }
-    uchar* shead = symbol_buffer;
-    uniq_symbol_cnt=0x0;
-    fhead = freq_buffer;
-    while(fhead != ftail){
-        if(*fhead++){
-            *shead++ = uniq_symbol_cnt++;
-        }
-    }
-
-}
-
-xnode* min_xnode(xnode* buffer, uchar len){
-    xnode* _min_xnode;
-    xnode* _head_xnode = buffer;
-    xnode* _tail_xnode = buffer+len;
-
-    while(_head_xnode != _tail_xnode){
-        if(_head_xnode){
-            _min_xnode = _head_xnode;
+    while(_head_dxnode != _tail_dxnode){
+        if(_head_dxnode){
+            _min_dxnode = _head_dxnode;
             break;
         }
-        _head_xnode++;
+        _head_dxnode++;
     }
 
-    if(!_min_xnode) return NULL;
+    if(!_min_dxnode) return NULL;
 
-    while(_head_xnode != _tail_xnode){
-        if(*_head_xnode){
-            if((*_head_xnode)->freq < (*_min_xnode)->freq){
-                _min_xnode = _head_xnode;
+    while(_head_dxnode != _tail_dxnode){
+        if(*_head_dxnode){
+            if((*_head_dxnode)->freq < (*_min_dxnode)->freq){
+                _min_dxnode = _head_dxnode;
             }
         }
-        _head_xnode++;
+        _head_dxnode++;
     }
-    return _min_xnode;
+    return _min_dxnode;
 }
 
-node hman_tree(uchar* symbol_buffer, ull* freq_buffer, uchar n){
+exnode* min_exnode(exnode* buffer, uchar len){
+    exnode* _min_exnode;
+    exnode* _head_exnode = buffer;
+    exnode* _tail_exnode = buffer+len;
 
-    xnode* xnode_buffer = new xnode[n];
-    xnode* xnode_head = xnode_buffer;
-    xnode* xnode_tail = xnode_buffer+n;
+    while(_head_exnode != _tail_exnode){
+        if(_head_exnode){
+            _min_exnode = _head_exnode;
+            break;
+        }
+        _head_exnode++;
+    }
+
+    if(!_min_exnode) return NULL;
+
+    while(_head_exnode != _tail_exnode){
+        if(*_head_exnode){
+            if((*_head_exnode)->freq < (*_min_exnode)->freq){
+                _min_exnode = _head_exnode;
+            }
+        }
+        _head_exnode++;
+    }
+    return _min_exnode;
+}
+
+
+
+
+dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
+
+    dxnode* dxnode_buffer = new dxnode[n];
+    dxnode* dxnode_head = dxnode_buffer;
+    dxnode* dxnode_tail = dxnode_buffer+n;
 
     uchar* symbol_head = symbol_buffer;
     ull* freq_head = freq_buffer;
 
-    while(xnode_head != xnode_tail){
-        *xnode_head = new node;
-        (*xnode_head)->left = NULL;
-        (*xnode_head)->right = NULL;
-        (*xnode_head)->symbol = symbol_head++;
-        (*xnode_head++)->freq = *freq_buffer++;
+    while(dxnode_head != dxnode_tail){
+        *dxnode_head = new dnode;
+        (*dxnode_head)->left = NULL;
+        (*dxnode_head)->right = NULL;
+        (*dxnode_head)->symbol = symbol_head++;
+        (*dxnode_head++)->freq = *freq_buffer++;
     }
 
     while(true){
-        xnode couple = new node;
-        xnode* min1 = min_xnode(xnode_buffer, n);
+        dxnode couple = new dnode;
+        dxnode* min1 = min_dxnode(dxnode_buffer, n);
         couple->symbol = NULL;
         couple->left = *min1;
         couple->freq = (*min1)->freq;
-        //*(min1)->up = couple; //check
+        //(*min1)->up = couple; //check
 
         *min1 = NULL; //check
-        xnode* min2 = min_xnode(xnode_buffer, n);
+        dxnode* min2 = min_dxnode(dxnode_buffer, n);
         if(min2){
             couple->right = *min2;
             couple->freq += (*min2)->freq;
             *min2 = couple;
-            //*(min2)->up = couple; //check
+            //(*min2)->up = couple; //check
             *min2 = NULL; //check
         }
         else return *(couple->left);
@@ -117,5 +107,56 @@ node hman_tree(uchar* symbol_buffer, ull* freq_buffer, uchar n){
     //*min_xnode(xnode_buffer, n) = NULL;
 }
 
-//void get_codes()
+void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* leaf_buffer){
+
+    exnode* exnode_buffer = new exnode[n];
+    exnode* exnode_head = exnode_buffer;
+    exnode* exnode_tail = exnode_buffer+n;
+
+    uchar* symbol_head = symbol_buffer;
+    ull* freq_head = freq_buffer;
+
+    while(exnode_head != exnode_tail){
+        *exnode_head = new enode;
+        (*exnode_head)->symbol = symbol_head++;
+        (*exnode_head++)->freq = *freq_buffer++;
+    }
+
+    exnode* leaf_head = leaf_buffer;
+    exnode* leaf_tail = leaf_buffer+0x100; // !
+    exnode_head = exnode_buffer;
+    freq_head = freq_buffer;
+    while(leaf_head != leaf_tail){
+        *leaf_head++ = *freq_head++ ? *exnode_head++ : NULL; // check?
+    }
+
+
+    while(true){
+        exnode couple = new enode;
+        exnode* min1 = min_exnode(exnode_buffer, n);
+        couple->symbol = NULL;
+        //couple->left = *min1;
+        (*min1)->polarity = NODEDIR::LEFT;
+        couple->freq = (*min1)->freq;
+        (*min1)->up = couple; //check
+
+        *min1 = NULL; //check
+        exnode* min2 = min_exnode(exnode_buffer, n);
+        if(min2){
+            //couple->right = *min2;
+            (*min2)->polarity = NODEDIR::RIGHT;
+            couple->freq += (*min2)->freq;
+            *min2 = couple;
+            (*min2)->up = couple; //check
+            *min2 = NULL; //check
+        }
+        //else return *(couple->left);
+        else {
+            couple->up = NULL;
+            break;
+        }
+    }
+    //*min_xnode(xnode_buffer, n) = NULL;
+    //*min_xnode(xnode_buffer, n) = NULL;
+}
 

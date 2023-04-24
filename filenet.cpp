@@ -56,7 +56,7 @@ void printbp(const uchar* data, const size_t& bitlen){
     std::cout << std::endl;
 }
 
-void transmit_file(const char* source_path){
+void transmit_file(const char* source_path){ // hman -t source_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
     size_t sbuff_size = f_in_pbuf->pubseekoff(0, f_in.end, f_in.in);
@@ -81,8 +81,8 @@ void transmit_file(const char* source_path){
         *(sz_blk+7) = (uchar)sbuff_size & 0xff;
 
 
-    //printbp(sz_blk, 64);
-    //memcpy(sz_blk, &BLK_SIZE, 8);
+    printbp(sz_blk, 64);
+    memcpy(sz_blk, &sbuff_size, 8);
 
     send(s, (const char*)sz_blk, 8, 0);
 
@@ -109,21 +109,21 @@ void transmit_file(const char* source_path){
 
 }
 
-void receive_file(const char* dest_path){
+void receive_file(const char* dest_path){ //hman -r dest_path
     std::cout << "Before get_socket_as_client" << std::endl;
     SOCKET s = get_socket_as_client();
     std::cout << "After get_socket_as_client" << std::endl;
     uchar* sz_blk = new uchar[8];
     recv(s, (char*)sz_blk, 8, 0);
 
-    //printbp(sz_blk, 64);
+    printbp(sz_blk, 64);
 
     size_t dbuff_size = (ull)*(sz_blk+7) | ((ull)*(sz_blk+6)<<0x8) | ((ull)*(sz_blk+5)<<0x10) | ((ull)*(sz_blk+4)<<0x18) | ((ull)*(sz_blk+3)<<0x20) | ((ull)*(sz_blk+2)<<0x28) | ((ull)*(sz_blk+1)<<0x30) | ((ull)*sz_blk<<0x38);
     dbuff_size += BLK_SIZE-(dbuff_size%BLK_SIZE);
 
-    /*std::cout << "Before memcpy" << std::endl;
+    std::cout << "Before memcpy" << std::endl;
     memcpy(&dbuff_size, sz_blk, 8);
-    std::cout << "After memcpy" << std::endl;*/
+    std::cout << "After memcpy" << std::endl;
 
     delete[] sz_blk;
 
