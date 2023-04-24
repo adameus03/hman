@@ -3,6 +3,8 @@
 #include "filenet.h"
 #include "code_fio.h"
 
+#include "tests.h"
+
 //g++ main.cpp net.cpp -o hman -lws2_32
 
 using namespace std;
@@ -24,6 +26,12 @@ void usage(char* argv0){
     std::cout << "Huffman-decode a file with unknown symbol-frequency map" << std::endl;
     std::cout << "    " << argv0 << " -d source_path dest_path" << std::endl;
     std::cout << std::endl;
+
+    checker(test_symfreq_catalogue(), "symfreq_catalogue");
+    checker(test_min_dxnode(), "min_dxnode");
+    checker(test_min_exnode(), "min_exnode");
+    checker(test_hman_dtree(), "hman_dtree");
+    checker(test_hman_etree(), "hman_etree");
 
 }
 

@@ -26,7 +26,7 @@ void store_symfreq(const char* dest_path, uchar* symbol_buffer, ull* freq_buffer
     uchar* dbuff = new uchar[dbuff_size];
 
     uchar* dbuff_head = dbuff;
-    uchar* dbuff_tail = dbuff+dbuff_size;
+    //uchar* dbuff_tail = dbuff+dbuff_size;
 
     *dbuff_head++ = uniq_symbol_cnt;
     memcpy(dbuff_head, symbol_buffer, uniq_symbol_cnt);
@@ -191,7 +191,7 @@ void encode_file_compact(const char* source_path, const char* dest_path){ // hma
     uchar* dbuff = new uchar[dbuff_size];
 
     uchar* dbuff_head = dbuff;
-    uchar* dbuff_tail = dbuff+dbuff_size;
+    //uchar* dbuff_tail = dbuff+dbuff_size;
 
 
     *dbuff_head++ = uniq_symbol_cnt;

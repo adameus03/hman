@@ -2,9 +2,11 @@
 #define HMAN_H_INCLUDED
 
 #include <cstddef>
+#include "hman.h"
+#include <iostream> //debug
+#include "tests.h" //debug
 
-
-enum NODEDIR{
+enum NODEDIR { // under default MinGW g++ settings, compiles to 16bit instead of 8bit...
     LEFT = 0x0,
     RIGHT = 0x1
 };

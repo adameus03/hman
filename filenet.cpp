@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include <iostream> //debug
+#include "tests.h" //debug
 
 /*
     BLK = 1024B of data
@@ -30,7 +31,7 @@ typedef unsigned long long ull;
 const size_t BLK_SIZE = 1024;
 const uchar ACK = 0xa;
 
-void printbp(const uchar* data, const size_t& bitlen){
+/*void printbp(const uchar* data, const size_t& bitlen){
     size_t len = bitlen / 8;
     uchar blm = (uchar)(bitlen%8);
 
@@ -54,7 +55,7 @@ void printbp(const uchar* data, const size_t& bitlen){
         }
     }
     std::cout << std::endl;
-}
+}*/
 
 void transmit_file(const char* source_path){ // hman -t source_path
     std::ifstream f_in(source_path, std::ifstream::binary);

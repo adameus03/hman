@@ -4,6 +4,8 @@ typedef unsigned long long ull;
 
 #include "hman.h"
 #include <cstring>
+#include "tests.h" //debug
+#include <iostream> //debug
 
 
 
@@ -30,25 +32,54 @@ void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_bu
     uchar* dhead = data_buffer;
     uchar* dtail = data_buffer+data_len;
     ull* fhead = freq_buffer;
-    ull* ftail = freq_buffer+0x100;
+    //ull* ftail = freq_buffer+0x100;
 
-    while(fhead != ftail){
-        *fhead++ = 0x0;
+    ull* nullfreq = new ull[0x100];
+    ull* nullfreq_head = nullfreq;
+    ull* nullfreq_tail = nullfreq+0x100;
+
+
+    while(nullfreq_head != nullfreq_tail){
+        *nullfreq_head++ = 0x0;
     }
+
+
+    printbp(data_buffer, 40);
+
     while(dhead != dtail){
 
         // *(freq_buffer+*dhead++)++; // MinGW g++ tak nie pozwala
-        ++*(freq_buffer+*dhead++);    // a tak pozwala
+        ++*(nullfreq+*dhead++);    // a tak pozwala
+
+        /*ull* f = nullfreq_buffer + *dhead;
+        (*freq)++;
+        dhead++;*/
 
     }
+
+    for(int i=0; i<256; i++){
+        std::cout << std::hex << i <<std::dec << "    ";
+        printu(*(nullfreq+i));
+    }
+
     uchar* shead = symbol_buffer;
     uniq_symbol_cnt=0x0;
-    fhead = freq_buffer;
-    while(fhead != ftail){
-        if(*fhead++){
-            *shead++ = uniq_symbol_cnt++;
+    uchar s = 0x0;
+    nullfreq_head = nullfreq;
+
+    while(nullfreq_head != nullfreq_tail){
+        if(*nullfreq_head){
+            *shead++ = s;
+            uniq_symbol_cnt++;
+            *fhead++ = *nullfreq_head;
         }
+        s++;
+        nullfreq_head++;
     }
+
+    printbp(symbol_buffer, 40);
+
+    delete[] nullfreq;
 
 }
 

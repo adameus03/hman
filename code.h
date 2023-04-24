@@ -1,6 +1,11 @@
 #ifndef CODE_H_INCLUDED
 #define CODE_H_INCLUDED
 
+#include "hman.h"
+#include <cstring>
+#include "tests.h" //debug
+#include <iostream> //debug
+
 typedef unsigned char uchar;
 typedef unsigned int uint;
 typedef unsigned long long ull;

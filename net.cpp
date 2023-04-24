@@ -16,7 +16,7 @@ SOCKET get_socket_as_server(){
     SOCKET mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(mainSocket==INVALID_SOCKET)
     {
-        printf("Error creating socket: %ld\n", WSAGetLastError());
+        printf("Error creating socket: %d\n", WSAGetLastError());
         WSACleanup();
         throw;
     }
@@ -49,7 +49,7 @@ SOCKET get_socket_as_server(){
 
     SOCKET acceptSocket = SOCKET_ERROR;
     printf("Waiting for a client to connect...\n");
-    while(acceptSocket==SOCKET_ERROR)
+    while(acceptSocket==(unsigned long long)SOCKET_ERROR)
     {
         acceptSocket = accept(mainSocket,NULL,NULL);
     }
@@ -74,7 +74,7 @@ SOCKET get_socket_as_client(){
     SOCKET mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(mainSocket==INVALID_SOCKET)
     {
-        printf("Error creating socket: %ld\n", WSAGetLastError());
+        printf("Error creating socket: %d\n", WSAGetLastError());
         WSACleanup();
         throw;
     }
