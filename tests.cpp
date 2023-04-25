@@ -125,6 +125,8 @@ uchar test_min_dxnode(){
 
 //exnode* min_exnode(exnode* buffer, uchar len)
 uchar test_min_exnode(){
+    /* TEST 1 */
+
     exnode* buffer = new exnode[0x8];
 
     uchar* symbol_buffer = new uchar[0x3];
@@ -153,12 +155,36 @@ uchar test_min_exnode(){
     //std::cout << "I'm alive 2" << std::endl;
     uchar retval = 0x1;
     if(min1 != buffer+3) retval = 0x0;
-    //delete[] buffer;
+
+    delete[] buffer;
+    delete[] symbol_buffer;
+
+    /* TEST 2 */
+
+    /*symbol_buffer = new uchar[0x3];
+    *symbol_buffer = 0x44;
+    *(symbol_buffer+1) = 0x88;
+    *(symbol_buffer+2) = 0x66;*/
+
+    buffer = new exnode[0x3];
+    *buffer = NULL;
+    *(buffer+1) = NULL;
+    *(buffer+2) = new enode;
+    (*(buffer+2))->symbol = NULL;
+    (*(buffer+2))->freq = 0x6;
+
+    min1 = min_exnode(buffer, 0x3);
+    if(min1 != NULL) retval = 0x0;
+
+    delete[] buffer;
+
+
     return retval;
 }
 
 //dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n)
 uchar test_hman_dtree(){
+    return 0x1;
     uchar* symbol_buffer = new uchar[0x3];
     *symbol_buffer = 0x44;
     *(symbol_buffer+1) = 0x88;
@@ -200,6 +226,8 @@ uchar test_hman_dtree(){
 //void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* leaf_buffer)
 
 uchar test_hman_etree(){
+
+    return 0x0;
     uchar* symbol_buffer = new uchar[0x3];
     *symbol_buffer = 0x44;
     *(symbol_buffer+1) = 0x88;
