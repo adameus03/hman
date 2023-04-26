@@ -34,6 +34,7 @@ void usage(char* argv0){
 
     checker(test_symfreq_catalogue(), "symfreq_catalogue");
     checker(test_encodec(), "encodec");
+    checker(test_decodec(), "decodec");
 
 }
 

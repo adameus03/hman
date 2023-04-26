@@ -49,4 +49,6 @@ uchar test_hman_etree();
 
 uchar test_encodec();
 
+uchar test_decodec();
+
 #endif // TESTS_H_INCLUDED

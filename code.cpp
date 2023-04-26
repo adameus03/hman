@@ -194,6 +194,7 @@ void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
     /*if(output_offset){
         output_len++;
     }*/
+    if(output_offset==0) output_len--;
     std::cout << "end encodec" << std::endl;
 }
 

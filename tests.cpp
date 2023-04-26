@@ -245,7 +245,9 @@ uchar test_hman_dtree(){
 
 uchar test_hman_etree(){
 
-    uchar* symbol_buffer = new uchar[0x3];
+    /* TEST 1 */
+
+    /*uchar* symbol_buffer = new uchar[0x3];
     *symbol_buffer = 0x44;
     *(symbol_buffer+1) = 0x88;
     *(symbol_buffer+2) = 0x66;
@@ -255,16 +257,9 @@ uchar test_hman_etree(){
     *(freq_buffer+2) = 0x3;
     uchar n = 0x3;
 
-    /*for(uchar i=0x0; i<n; i++){
-        printu(*(freq_buffer+i));
-    }*/
-
-    //exnode* leaf_buffer = new exnode[n];
     exnode* leaf_buffer = new exnode[0x100]; // !
 
-    //std::cout << "Bef ecall" << std::endl;
     hman_etree(symbol_buffer, freq_buffer, n, leaf_buffer);
-    //std::cout << "Aft ecall" << std::endl;
 
     uchar retval = 0x1;
 
@@ -294,6 +289,67 @@ uchar test_hman_etree(){
 
     if(leaf_buffer[0x44]->up != leaf_buffer[0x88]->up) retval = 0x0;
     if(leaf_buffer[0x66]->up != leaf_buffer[0x44]->up->up) retval = 0x0;
+
+    delete[] symbol_buffer;
+    delete[] freq_buffer;
+    delete[] leaf_buffer;*/
+
+    std::cout << "etree test 2" << std::endl;
+
+    /* TEST 2 */ uchar retval = 0x1;
+
+    uchar* symbol_buffer = new uchar[0x3];
+    *symbol_buffer = 0x61;
+    *(symbol_buffer+1) = 0x62;
+    *(symbol_buffer+2) = 0x63;
+    ull* freq_buffer = new ull[0x3];
+    *freq_buffer = 0x1;
+    *(freq_buffer+1) = 0x1;
+    *(freq_buffer+2) = 0x1;
+    uchar n = 0x3;
+
+    /*for(uchar i=0x0; i<n; i++){
+        printu(*(freq_buffer+i));
+    }*/
+
+    //exnode* leaf_buffer = new exnode[n];
+    exnode* leaf_buffer = new exnode[0x100]; // !
+
+    //std::cout << "Bef ecall" << std::endl;
+    hman_etree(symbol_buffer, freq_buffer, n, leaf_buffer);
+    //std::cout << "Aft ecall" << std::endl;
+
+    if(leaf_buffer[0x61]->freq != 0x1) retval = 0x0;
+    if(leaf_buffer[0x62]->freq != 0x1) retval = 0x0;
+    if(leaf_buffer[0x63]->freq != 0x1) retval = 0x0;
+
+    if(leaf_buffer[0x61]->symbol != symbol_buffer) retval = 0x0;
+    if(leaf_buffer[0x62]->symbol != symbol_buffer+1) retval = 0x0;
+    if(leaf_buffer[0x63]->symbol != symbol_buffer+2) retval = 0x0;
+
+    if(leaf_buffer[0x61]->up->freq != 0x2) retval = 0x0;
+    if(leaf_buffer[0x61]->up->symbol != NULL) retval = 0x0;
+    if(leaf_buffer[0x61]->up->up->freq != 0x3) retval = 0x0;
+    if(leaf_buffer[0x61]->up->up->up != NULL){
+        retval = 0x0;
+
+        print_exnode(leaf_buffer[0x61]);
+        print_exnode(leaf_buffer[0x61]->up);
+        print_exnode(leaf_buffer[0x61]->up->up);
+        std::cout << "!!!!!!!!!!!!!" << std::endl;
+        print_exnode(leaf_buffer[0x61]->up->up->up);
+        std::cout << "!!!!!!!!!!!!!" << std::endl;
+    }
+
+
+
+    if(leaf_buffer[0x61]->up != leaf_buffer[0x62]->up) retval = 0x0;
+    if(leaf_buffer[0x63]->up != leaf_buffer[0x61]->up->up) retval = 0x0;
+
+    delete[] symbol_buffer;
+    delete[] freq_buffer;
+    delete[] leaf_buffer;
+
 
     return retval;
 }
@@ -335,7 +391,7 @@ uchar test_symfreq_catalogue(){
 }
 
 //void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len);
-uchar test_encodec(){ return 0x0;
+uchar test_encodec(){ //return 0x0;
     /* TEST 1 */
 
     uchar* input_data = new uchar[0x3];
@@ -401,10 +457,44 @@ uchar test_encodec(){ return 0x0;
     encodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
     std::cout << "Conditions (II)" << std::endl;
     if(output_len != 0x1) retval = 0x0;
-    else if(((*output_data)&0xfc) != 0x1c) retval = 0x0;
+    else if(((*output_data)&0xf8) != 0xb0) retval = 0x0;
 
+    std::cout << "output2" << std::endl;
+    printbp(output_data, 8);
+
+    delete[] input_data;
+    delete[] symbol_buffer;
+    delete[] freq_buffer;
+    delete[] output_data;
 
     return retval;
 
+}
+
+//void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len)
+uchar test_decodec(){
+    std::cout << "Test decodec" << std::endl;
+    uchar* input_data = new uchar[0x1];
+
+    size_t input_len = 0x1;
+    uchar* symbol_buffer = new uchar[0x3];
+    ull* freq_buffer = new ull[0x3];
+    uchar n = 0x3;
+    uchar* output_data = new uchar[n];
+    size_t output_len = 0x0;
+
+    decodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
+
+    uchar retval = 0x1;
+    if(output_len != 0x3) retval = 0x0;
+    else if(*output_data != 0x44) retval = 0x0;
+    else if(*(output_data+1) != 0x88) retval = 0x0;
+    else if(*(output_data+2) != 0x66) retval = 0x0;
+
+    delete[] symbol_buffer;
+    delete[] freq_buffer;
+    delete[] output_data;
+
+    return retval;
 }
 

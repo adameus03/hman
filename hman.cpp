@@ -123,10 +123,14 @@ uchar min_exnode(exnode* buffer, exnode*& minptr, uchar len){
     /*std::cout << "n3=";
     printbp(&len, 8);*/
 
-    if(_head_exnode == _tail_exnode){
+    /*if(_head_exnode == _tail_exnode){
         minptr = _min_exnode;
         return 0x1;
-    }
+    }*/
+
+
+    uchar retval = 0x1;
+
 
     while(_head_exnode != _tail_exnode){
         /*std::cout << "_head_exnode=" << _head_exnode << std::endl;
@@ -135,6 +139,7 @@ uchar min_exnode(exnode* buffer, exnode*& minptr, uchar len){
 
         std::cout<<"min_exnode loop"<<std::endl;*/
         if(*_head_exnode){
+            retval = 0x0;
             /*std::cout << "min_exnode inloop cond 1" << std::endl;
             std::cout << ((*_head_exnode)->freq) << std::endl;
             std::cout << ((*_min_exnode)->freq) << std::endl;*/
@@ -151,7 +156,7 @@ uchar min_exnode(exnode* buffer, exnode*& minptr, uchar len){
     }
     //std::cout<<"bef min_exnode exit"<<std::endl;
     minptr = _min_exnode;
-    return 0x0;
+    return retval;
 }
 
 
@@ -350,253 +355,62 @@ dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
 
 void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* leaf_buffer){
 
-    //printbp(symbol_buffer, 8*n);
-
-    /*
-        0x44    *symbol_buffer
-        0x88    *(symbol_buffer+1)
-        0x66    *(symbol_buffer+2)
-
-        0x1     *freq_buffer
-        0x2     *(freq_buffer+1)
-        0x3     *(freq_buffer+2)
-
-        0x3     n
-
-    */
-
-    exnode* exnode_buffer = new exnode[n];
-    exnode* exnode_head = exnode_buffer;
-    exnode* exnode_tail = exnode_buffer+n;
 
     uchar* symbol_head = symbol_buffer;
-    uchar* symbol_tail = symbol_buffer+n;
-
+    uchar* symbol_tail = symbol_head+n;
     ull* freq_head = freq_buffer;
 
+    exnode* exnode_buffer = new exnode[n];
 
-    //uchar c=0x0; //debug
-    while(exnode_head != exnode_tail){
-        *exnode_head = new enode;
-        (*exnode_head)->symbol = symbol_head++;
-        (*exnode_head)->freq = *freq_head++;
+    exnode* exnode_head = exnode_buffer;
+
+    while(symbol_head != symbol_tail){
+        leaf_buffer[*symbol_head] = new enode;
+        leaf_buffer[*symbol_head]->symbol = symbol_head;
+        leaf_buffer[*symbol_head]->freq = *freq_head++;
+
+        *exnode_head = leaf_buffer[*symbol_head];
+
         exnode_head++;
-        //c++; //debug
-    }
-
-    /*
-
-        0x44    *((*exnode_buffer)->symbol)
-        0x1     (*exnode_buffer)->freq
-
-        0x88    *((*(exnode_buffer+1))->symbol)
-        0x2     (*(exnode_buffer+1))->freq
-
-        0x66    *((*(exnode_buffer+2))->symbol)
-        0x3     (*(exnode_buffer+2))->freq
-
-    */
-
-    ///<old debug>
-    /*if((*exnode_buffer)->symbol == symbol_buffer && (*(exnode_buffer+1))->symbol == symbol_buffer+1 && (*(exnode_buffer+2))->symbol == symbol_buffer+2) std::cout << "!!!!ITS OKAY" << std::endl;
-    else std::cout << "!!!!ITS NOT OKAY" << std::endl;*/
-    ///</old debug>
-
-    /*for(uchar i=0x0; i<n; i++){
-        printu(*(freq_buffer+i));
-    }*/
-
-    exnode* leaf_head = leaf_buffer;
-    exnode* leaf_tail = leaf_buffer+0x100; // !
-    //exnode* leaf_tail = leaf_buffer+0x100; // !
-    //exnode* leaf_tail = leaf_buffer+n;
-    exnode_head = exnode_buffer;
-    //freq_head = freq_buffer;
-    symbol_head = symbol_buffer;
-
-    /*while(leaf_head != leaf_tail){
-        // *leaf_head = (*freq_head) ? (*exnode_head) : NULL; // check?
-
-        if(*freq_head){
-            *leaf_head = *exnode_head;
-            exnode_head++;
-            freq_head++;
-        }
-        else {
-            *leaf_head = NULL;
-        }
-
-        leaf_head++;
-    }*/
-    /*for(uint i=0; i<256u; i++){
-        if((*symbol_head) == (uchar)i){
-            *leaf_head = *exnode_head;
-            symbol_head++;
-            exnode_head++;
-        }
-        else {
-            *leaf_head = NULL;
-        }
-        leaf_head++;
-    }*/
-
-    while(leaf_head<leaf_tail){
-        *leaf_head++ = NULL;
-    }
-    leaf_head = leaf_buffer;
-    while(symbol_head<symbol_tail){
-        *(leaf_head + *symbol_head) = *exnode_head;
         symbol_head++;
-        exnode_head++;
     }
 
+    std::cout << "Before DEBUG LOOP" << std::endl;
 
+    uchar stay = 0x1;
 
-    // Is symbol really necessary in enodes ? I.e. it's obvius that *(leaf_buffer[symb])->symb == symb
-
-    /*
-        NULL    leaf_buffer[0x0 ... 0x43]
-
-        0x44    *(leaf_buffer[0x44]->symbol)
-        0x1     leaf_buffer[0x44]->freq
-
-        NULL    leaf_buffer[0x45 ... 0x65]
-
-        0x66    *(leaf_buffer[0x66]->symbol)
-        0x3     leaf_buffer[0x66]->freq
-
-        NULL    leaf_buffer[0x67 ... 0x87]
-
-        0x88    *(leaf_buffer[0x88]->symbol)
-        0x2     leaf_buffer[0x88]->freq
-
-        NULL    leaf_buffer[0x89 ... 0xff]
-
-    */
-
-    /*std::cout<<"BEGIN SYMBOL PRINTAGE" << std::endl;
-    printbp(symbol_buffer, 8*n);
-    std::cout<<"END SYMBOL PRINTAGE" << std::endl;
-
-    std::cout << "START symbol test" << std::endl;
-    ushort j=0x0;
-    for(ushort i=0x0; i<0x100; i++){
-        if(*(symbol_buffer+j) == (uchar)i) { std::cout << "HEY!" << std::endl; j++; }
-        //std::cout << std::hex << i << std::dec << "    " << ((*(leaf_buffer+i)!=NULL)?"not NULL":"NULL") << std::endl;
-    }
-    std::cout << "END symbol test" << std::endl;*/
-
-
-    ///<old debug>
-    /*std::cout << "START PRINT LEAF_BUFFER" << std::endl;
-    for(uint i=0; i<256u; i++){
-        //if(*(leaf_buffer+i)) std::cout << "HERE" << std::endl;
-        std::cout << std::hex << i << std::dec << "    " << ((*(leaf_buffer+i)!=NULL)?"not NULL":"NULL") << std::endl;
-    }
-    std::cout << "END PRINT LEAF_BUFFER" << std::endl;*/
-
-    //return;
-
-    /*std::cout << "ebetw loops" << std::endl;
-
-    printbp(symbol_buffer, 24);
-
-
-    for(uchar i=0x0; i<n; i++){
-        printu(*(freq_buffer+i));
-    }
-
-
-
-    std::cout << "n=";
-    printbp(&n, 8);*/
-
-    ///</old debug>
-
-    //return;
-    ///<old debug>
-    /*uchar c = 0x0; //debug;*/
-    ///</old debug>
-
-    while(true){ //DEBUG THIS LOOP
-
-        ///<debug print>
-        /*std::cout << "<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3" << (int)c << std::endl;
+    while(stay){ //DEBUG THIS LOOP
+        std::cout << "DEBUG LOOP ITERATION START" << std::endl;
+        ///<debugging loop>
         for(int i=0; i<n; i++){
             print_exnode(*(exnode_buffer+i));
         }
-        std::cout << "#################################" << (int)c << std::endl;*/
-        ///</debug print>
-
-        ///<old debug>
-        /*std::cout << "S T A R T : ";
-        printbp(&c, 8);
-
-        std::cout << "bef new couple" << std::endl;*/
-        ///</old debug>
+        ///</debugging loop>
 
         exnode couple = new enode;
 
-        ///<old debug>
-        /*std::cout << "aft new couple" << std::endl;
-        std::cout << "bef emin" << std::endl;
-        std::cout << "n1=";
-        printbp(&n, 8);*/
-        ///</old debug>
-        //return;
-        //exnode* min1 = min_exnode(exnode_buffer, n);
         exnode* min1;
+        std::cout << "Bef min" << std::endl;
         if(min_exnode(exnode_buffer, min1, n)){
             (*min1)->up = NULL;
+            std::cout << "LAAST" << std::endl;
             break;
         }
-
-        ///<old debug>
-        /* std::cout << "bef esymbonull" << std::endl; */
-        ///</old debug>
+        std::cout << "Aft min" << std::endl;
 
         couple->symbol = NULL;
 
-        ///<old debug>
-        /* std::cout << "aft esymbonull" << std::endl; */
-        ///</old debug>
-
-        //couple->left = *min1;
         (*min1)->polarity = NODEDIR::LEFT;
         couple->freq = (*min1)->freq;
         (*min1)->up = couple; //check
 
-        ///<old debug>
-        // std::cout << "einloop" << std::endl;
-        ///</old debug>
-
-
-
         *min1 = NULL; //check
-        ///<debug>
-        //std::cout << "nullmin" << std::endl;
-        ///</debug>
 
         exnode* min2;
-        min_exnode(exnode_buffer, min2, n);
-        //return;
-        /*if(min2){
-            //couple->right = *min2;
-            (*min2)->polarity = NODEDIR::RIGHT;
-            couple->freq += (*min2)->freq;
-
-            (*min2)->up = couple; //check
-            *min2 = couple;
-
+        /*stay = !*/min_exnode(exnode_buffer, min2, n);
+        /*if(!stay){
             //(*min2)->up = NULL;
-
-
-        }
-        //else return *(couple->left);
-        else {
-            //return;
-            //couple->up = NULL;
-            break;
+            std::cout << "!stay" << std::endl;
         }*/
 
         (*min2)->polarity = NODEDIR::RIGHT;
@@ -605,29 +419,11 @@ void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* 
         (*min2)->up = couple; //check
         *min2 = couple;
 
-
-        ///<old debug>
-        /*std::cout << "F I N I S H : ";
-        printbp(&c, 8);*/
-        ///</old debug>
-
-        ///<old debug>
-        /* c++; //debug */
-        ///</old debug>
-        //return;
+        //(*min2)->up = NULL;
+        /*if(!stay){
+            break;
+        }*/
     }
-    //*min_xnode(xnode_buffer, n) = NULL;
-    //*min_xnode(xnode_buffer, n) = NULL;
-
-    ///<debug>
-    /*std::cout << "START PRINT ___FINAL___ LEAF_BUFFER" << std::endl;
-    for(uint i=0; i<256u; i++){
-        //if(*(leaf_buffer+i)) std::cout << "HERE" << std::endl;
-        std::cout << std::hex << i << std::dec << "    " << ((*(leaf_buffer+i)!=NULL)?"not NULL":"NULL") << std::endl;
-    }
-    std::cout << "END PRINT ___FINAL___ LEAF_BUFFER" << std::endl;*/
-    ///</debug>
-
 
 }
 
