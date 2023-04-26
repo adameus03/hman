@@ -99,7 +99,7 @@ void transmit_file(const char* source_path){ // hman -t source_path
             throw;
         }
         std::cout << "Sending block" << std::endl;
-        //printbp(sbuff+u, BLK_SIZE);
+        printbp(sbuff+u, BLK_SIZE);
         send(s, (const char*)(sbuff+u), BLK_SIZE, 0); //int
     }
 
@@ -141,7 +141,7 @@ void receive_file(const char* dest_path){ //hman -r dest_path
         std::cout << "Sent ACK" << std::endl;
         std::cout << "Receiving block..." << std::endl;
         recv(s, (char*)(dbuff+u), BLK_SIZE, 0); //int
-        //printbp(dbuff+u,BLK_SIZE);
+        printbp(dbuff+u,BLK_SIZE);
     }
 
 

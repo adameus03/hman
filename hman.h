@@ -34,7 +34,9 @@ typedef enode* exnode; //for encoding
 
 dxnode* min_dxnode(dxnode* buffer, uchar len);
 
-exnode* min_exnode(exnode* buffer, uchar len);
+//exnode* min_exnode(exnode* buffer, uchar len);
+
+uchar min_exnode(exnode* buffer, exnode*& minptr, uchar len);
 
 dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n);
 
