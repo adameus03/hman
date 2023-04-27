@@ -49,7 +49,10 @@ void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_bu
     while(dhead != dtail){
 
         // *(freq_buffer+*dhead++)++; // MinGW g++ tak nie pozwala
-        ++*(nullfreq+*dhead++);    // a tak pozwala
+        //++*(nullfreq+*dhead++);    // a tak pozwala
+
+        *(nullfreq+*dhead) = *(nullfreq+*dhead) + 1;
+        dhead++;
 
         /*ull* f = nullfreq_buffer + *dhead;
         (*freq)++;

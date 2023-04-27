@@ -148,7 +148,7 @@ void encode_file_distinct_recycle(const char* source_path, const char* dest_path
     uchar* symbol_buffer = new uchar[0x100];
     ull* freq_buffer = new ull[0x100];
     uchar n;
-    load_symfreq(source_path, symbol_buffer, freq_buffer, n);
+    load_symfreq(symfreq_path, symbol_buffer, freq_buffer, n);
 
     uchar* output = new uchar[sbuff_size];
     size_t output_len;

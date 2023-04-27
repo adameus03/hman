@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     else if(!strcmp("-r", argv[1])){
         if(argc != 3){ usage(*argv); return 0; }
         cout << "Receiver mode" << endl;
-        receive_file(argv[2]);
+        receive_file(argv[2]);  std::cout << "After receiver mode" <<std::endl;
     }
     else if(!strcmp("-e", argv[1])){
         if(argc==4){
@@ -83,6 +83,7 @@ int main(int argc, char** argv)
     }
 
 
+    std::cout << "AFTER CONDITIONS" << std::endl;
 
     /*cout << "Hello world!" << endl;
     if(argc==3){

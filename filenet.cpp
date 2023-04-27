@@ -120,7 +120,7 @@ void receive_file(const char* dest_path){ //hman -r dest_path
     printbp(sz_blk, 64);
 
     size_t dbuff_size = (ull)*(sz_blk+7) | ((ull)*(sz_blk+6)<<0x8) | ((ull)*(sz_blk+5)<<0x10) | ((ull)*(sz_blk+4)<<0x18) | ((ull)*(sz_blk+3)<<0x20) | ((ull)*(sz_blk+2)<<0x28) | ((ull)*(sz_blk+1)<<0x30) | ((ull)*sz_blk<<0x38);
-    dbuff_size += BLK_SIZE-(dbuff_size%BLK_SIZE);
+    //dbuff_size += BLK_SIZE-(dbuff_size%BLK_SIZE);
 
     std::cout << "Before memcpy" << std::endl;
     memcpy(&dbuff_size, sz_blk, 8);
@@ -132,8 +132,9 @@ void receive_file(const char* dest_path){ //hman -r dest_path
 
     std::cout << "dbuff_size: " << dbuff_size << std::endl;
 
-    uchar* dbuff = new uchar[dbuff_size];
+    uchar* dbuff = new uchar[dbuff_size+BLK_SIZE-(dbuff_size%BLK_SIZE)];
     std::cout << "After alloc" << std::endl;
+
 
 
     for(ull u=0x0; u<dbuff_size; u+=BLK_SIZE){
@@ -141,10 +142,10 @@ void receive_file(const char* dest_path){ //hman -r dest_path
         std::cout << "Sent ACK" << std::endl;
         std::cout << "Receiving block..." << std::endl;
         recv(s, (char*)(dbuff+u), BLK_SIZE, 0); //int
-        printbp(dbuff+u,BLK_SIZE);
+        //printbp(dbuff+u,BLK_SIZE);
     }
 
-
+    std::cout << "After receive_file LOOP" << std::endl;
 
     std::ofstream f_out(dest_path, std::ofstream::trunc|std::ofstream::binary);
     std::filebuf* f_out_pbuf = f_out.rdbuf();
