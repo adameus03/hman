@@ -411,7 +411,7 @@ uchar test_encodec(){ //return 0x0;
     *(freq_buffer+2) = 0x3;
 
     uchar n = 0x3;
-    uchar* output_data = new uchar[input_len];
+    uchar* output_data = new uchar[input_len+0x1];
     size_t output_len = 0x0;
 
     std::cout << "Bef encodec call" << std::endl;
@@ -421,8 +421,9 @@ uchar test_encodec(){ //return 0x0;
     uchar retval = 0x1;
     std::cout << "Conditions" << std::endl;
     std::cout << output_len << std::endl;
-    if(output_len != 0x1) retval = 0x0;
+    if(output_len != 0x2) retval = 0x0;
     else if(((*output_data) & 0xf8) != 0x18) retval = 0x0;
+    else if(*(output_data+1) != 0x5) retval = 0x0;
 
     printbp(output_data, 8);
 
@@ -452,12 +453,13 @@ uchar test_encodec(){ //return 0x0;
     *(freq_buffer+2) = 0x1;
 
     n = 0x3;
-    output_data = new uchar[input_len];
+    output_data = new uchar[input_len+0x1];
     output_len = 0x0;
     encodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
     std::cout << "Conditions (II)" << std::endl;
-    if(output_len != 0x1) retval = 0x0;
+    if(output_len != 0x2) retval = 0x0;
     else if(((*output_data)&0xf8) != 0xb0) retval = 0x0;
+    else if(*(output_data+1) != 0x5) retval = 0x0;
 
     std::cout << "output2" << std::endl;
     printbp(output_data, 8);
@@ -473,27 +475,51 @@ uchar test_encodec(){ //return 0x0;
 
 //void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len)
 uchar test_decodec(){
-    std::cout << "Test decodec" << std::endl;
-    uchar* input_data = new uchar[0x1];
+    /* Test 1 */
 
-    size_t input_len = 0x1;
+    std::cout << "Test decodec" << std::endl;
+    uchar* input_data = new uchar[0x2];
+    *input_data = 0x18;
+    *(input_data+1) = 0x5;
+
+    size_t input_len = 0x2;
     uchar* symbol_buffer = new uchar[0x3];
+    *symbol_buffer = 0x44;
+    *(symbol_buffer+1) = 0x88;
+    *(symbol_buffer+2) = 0x66;
+
     ull* freq_buffer = new ull[0x3];
+    *freq_buffer = 0x1;
+    *(freq_buffer+1) = 0x2;
+    *(freq_buffer+2) = 0x3;
+
     uchar n = 0x3;
-    uchar* output_data = new uchar[n];
+    uchar* output_data = new uchar[n+0x1];
     size_t output_len = 0x0;
 
+    std::cout << "Bef decodec call" << std::endl;
     decodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
+    std::cout << "Aft decodec call" << std::endl;
 
     uchar retval = 0x1;
-    if(output_len != 0x3) retval = 0x0;
+    if(output_len != 0x3) retval = 0x0; //temp - really 3
     else if(*output_data != 0x44) retval = 0x0;
     else if(*(output_data+1) != 0x88) retval = 0x0;
     else if(*(output_data+2) != 0x66) retval = 0x0;
+    //else if(*(output_data+3) != 0x44) retval = 0x0; // temp
+
+    std::cout << "Decoding output length: " << output_len;
+    std::cout << "Decoding output data: ";
+    printbp(output_data, 8*output_len);
 
     delete[] symbol_buffer;
     delete[] freq_buffer;
+    delete[] input_data;
     delete[] output_data;
+
+    /* Test 2 */
+
+
 
     return retval;
 }
