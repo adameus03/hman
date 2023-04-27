@@ -72,7 +72,7 @@ int main(int argc, char** argv)
             std::cout << "Huffman-decode a file with unknown symbol-frequency map" << std::endl;
             decode_file_compact(argv[2], argv[3]);
         }
-        else if(argc==5){
+        else if(argc==5){ //std::cout << "BINGO" << std::endl;
             std::cout << "Huffman-decode file using a known symbol-frequency map" << std::endl;
             decode_file_distinct(argv[2], argv[3], argv[4]);
         }

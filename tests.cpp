@@ -520,6 +520,45 @@ uchar test_decodec(){
     /* Test 2 */
 
 
+    std::cout << "II Test decodec" << std::endl;
+    input_data = new uchar[0x2];
+    *input_data = 0xb0;
+    *(input_data+1) = 0x5;
+
+    input_len = 0x2;
+    symbol_buffer = new uchar[0x3];
+    *symbol_buffer = 0x61;
+    *(symbol_buffer+1) = 0x62;
+    *(symbol_buffer+2) = 0x63;
+
+    freq_buffer = new ull[0x3];
+    *freq_buffer = 0x1;
+    *(freq_buffer+1) = 0x1;
+    *(freq_buffer+2) = 0x1;
+
+    n = 0x3;
+    output_data = new uchar[n+0x1];
+    output_len = 0x0;
+
+    std::cout << "Bef decodec call" << std::endl;
+    decodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
+    std::cout << "Aft decodec call" << std::endl;
+
+
+    if(output_len != 0x3) retval = 0x0; //temp - really 3
+    else if(*output_data != 0x61) retval = 0x0;
+    else if(*(output_data+1) != 0x62) retval = 0x0;
+    else if(*(output_data+2) != 0x63) retval = 0x0;
+    //else if(*(output_data+3) != 0x44) retval = 0x0; // temp
+
+    std::cout << "Decoding output length: " << output_len;
+    std::cout << "Decoding output data: ";
+    printbp(output_data, 8*output_len);
+
+    delete[] symbol_buffer;
+    delete[] freq_buffer;
+    delete[] input_data;
+    delete[] output_data;
 
     return retval;
 }

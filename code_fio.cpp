@@ -62,6 +62,7 @@ void store_symfreq(const char* dest_path, uchar* data_buffer, const size_t& data
 }
 
 void load_symfreq(const char* source_path, uchar* symbol_buffer, ull* freq_buffer, uchar& n){
+
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
     size_t sbuff_size = f_in_pbuf->pubseekoff(0, f_in.end, f_in.in);
@@ -69,6 +70,14 @@ void load_symfreq(const char* source_path, uchar* symbol_buffer, ull* freq_buffe
     uchar* sbuff = new uchar[sbuff_size];
     f_in_pbuf->sgetn((char*)sbuff, sbuff_size);
     f_in.close();
+
+    /*std::cout << "<SOURCE_PATH>" << std::endl;
+    std::cout << source_path << std::endl;
+    std::cout << "</SOURCE_PATH>" << std::endl;
+
+    std::cout << "<SBUFF>" << std::endl;
+    printbp(sbuff, sbuff_size*8);
+    std::cout << "</SBUFF>" << std::endl;*/
 
     uchar* sbuff_head = sbuff;
     n = *sbuff_head++;
@@ -81,6 +90,13 @@ void load_symfreq(const char* source_path, uchar* symbol_buffer, ull* freq_buffe
         *freq_head++ = (ull)*(sbuff_head+7) | ((ull)*(sbuff_head+6)<<0x8) | ((ull)*(sbuff_head+5)<<0x10) | ((ull)*(sbuff_head+4)<<0x16) | ((ull)*(sbuff_head+3)<<0x20) | ((ull)*(sbuff_head+2)<<0x28) | ((ull)*(sbuff_head+1)<<0x30) | ((ull)*sbuff_head<<0x38);
         sbuff_head += 0x8;
     }
+
+
+    /*std::cout << "<N>" << std::endl;
+    printbp(&n, 8);
+    std::cout << "</N>" << std::endl;*/
+
+
     delete[] sbuff;
 }
 
@@ -157,10 +173,17 @@ void decode_file_distinct(const char* source_path, const char* dest_path, const 
     uchar* symbol_buffer = new uchar[0x100];
     ull* freq_buffer = new ull[0x100];
     uchar n;
-    load_symfreq(source_path, symbol_buffer, freq_buffer, n);
+    load_symfreq(symfreq_path, symbol_buffer, freq_buffer, n);
 
     uchar* output = new uchar[sbuff_size];
     size_t output_len;
+
+    /*std::cout << "<SBUFF_SIZE>" << std::endl;
+    std::cout << sbuff_size << std::endl;
+    std::cout<< "</SBUFF_SIZE>" << std::endl;
+    std::cout << "<N>" << std::endl;
+    printbp(&n, 8);
+    std::cout << "</N>" << std::endl;*/
 
     decodec(sbuff, sbuff_size, symbol_buffer, freq_buffer, n, output, output_len);
     store_data(dest_path, output, output_len);

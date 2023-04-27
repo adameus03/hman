@@ -207,7 +207,22 @@ void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
 }
 
 void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len){
+
+    /*std::cout << "DECODEC INPUT" << std::endl;
+    std::cout << "Input: " << std::endl;
+    printbp(input_data, 8*input_len);
+    std::cout << "Symbol buffer: " << std::endl;
+    printbp(symbol_buffer, 8*n);
+    std::cout << "Freq buffer: " << std::endl;
+    for(int i=0; i<n; i++){
+        printu(*(freq_buffer+i));
+    }
+    std::cout << "n: " << std::endl;
+    std::cout << (int)n << std::endl;*/
+
+
     dnode root = hman_dtree(symbol_buffer, freq_buffer, n);
+
 
     /*inside_checker(*input_data == 0x18, "");
     inside_checker(input_len == 0x1, "");
@@ -267,7 +282,7 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
 
         uchar max_offset = (input_head == (input_tail-2)) ? *(input_tail-1) : 0x8; // last byte is output_offset of encodec
 
-        std::cout << (int)max_offset << std::endl;
+        //std::cout << (int)max_offset << std::endl;
 
         while(input_offset < max_offset){
             if((*input_head>>(0x7-input_offset))&0x1){
@@ -303,4 +318,8 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
         }
 
     }
+    /*std::cout << "OUTPUT_LEN" << std::endl;
+    std::cout << (int)output_len << std::endl;
+    std::cout << "OUTPUT" << std::endl;
+    printbp(output_data, 8*output_len);*/
 }
