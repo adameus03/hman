@@ -14,8 +14,8 @@ void usage(char* argv0){
     std::cout << "Usage:" << std::endl;
     std::cout << "Transmit file" << std::endl;
     std::cout << "    " << argv0 << " -t source_path" << std::endl;
-    std::cout << "Receive file" << std::endl;
-    std::cout << "    " << argv0 << " -r dest_path" << std::endl;
+    std::cout << "Receive file from host" << std::endl;
+    std::cout << "    " << argv0 << " -r dest_path ip_addr" << std::endl;
     std::cout << "Huffman-encode file with symbol-frequency map output in separate file" << std::endl;
     std::cout << "    " << argv0 << " -e source_path dest_path symfreq_path" << std::endl;
     std::cout << "Huffman-encode file using a known symbol-frequency map" << std::endl;
@@ -53,9 +53,9 @@ int main(int argc, char** argv)
         transmit_file(argv[2]);
     }
     else if(!strcmp("-r", argv[1])){
-        if(argc != 3){ usage(*argv); return 0; }
+        if(argc != 4){ usage(*argv); return 0; }
         cout << "Receiver mode" << endl;
-        receive_file(argv[2]);  std::cout << "After receiver mode" <<std::endl;
+        receive_file(argv[2], argv[3]);  std::cout << "After receiver mode" <<std::endl;
     }
     else if(!strcmp("-e", argv[1])){
         if(argc==4){

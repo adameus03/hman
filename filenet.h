@@ -10,7 +10,7 @@
 
 void transmit_file(const char* source_path);
 
-void receive_file(const char* dest_path);
+void receive_file(const char* dest_path, const char* ip_addr);
 
 
 #endif // FILENET_H_INCLUDED

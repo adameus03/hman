@@ -60,7 +60,7 @@ SOCKET get_socket_as_server(){
 }
 
 
-SOCKET get_socket_as_client(){
+SOCKET get_socket_as_client(const char* ip_addr){
     WSADATA wsaData;
 
     int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -84,7 +84,7 @@ SOCKET get_socket_as_client(){
     sockaddr_in service;
     memset(&service, 0, sizeof(service));
     service.sin_family = AF_INET;
-    service.sin_addr.s_addr = inet_addr("127.0.0.1");
+    service.sin_addr.s_addr = inet_addr(ip_addr);
     service.sin_port = htons(27015);
 
 

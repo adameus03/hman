@@ -110,9 +110,9 @@ void transmit_file(const char* source_path){ // hman -t source_path
 
 }
 
-void receive_file(const char* dest_path){ //hman -r dest_path
+void receive_file(const char* dest_path, const char* ip_addr){ //hman -r dest_path ip_addr
     std::cout << "Before get_socket_as_client" << std::endl;
-    SOCKET s = get_socket_as_client();
+    SOCKET s = get_socket_as_client(ip_addr);
     std::cout << "After get_socket_as_client" << std::endl;
     uchar* sz_blk = new uchar[8];
     recv(s, (char*)sz_blk, 8, 0);
