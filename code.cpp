@@ -6,6 +6,8 @@ typedef unsigned long long ull;
 #include <cstring>
 #include "tests.h" //debug
 #include <iostream> //debug
+#include "bt_print.h" //debug
+#include <windows.h> //debug
 
 
 
@@ -86,27 +88,117 @@ void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_bu
 
 }
 
+//returns dest shift
+// content_len - in bits!
+size_t inject(uchar*& dest, const uint& content, const uchar& content_len, uchar& dest_offset){
+    // przesun content o 32-content_len w lewo
+    // przesun content o 24+dest_offset w prawo
+
+    // wynikowo: przesun w prawo o 24+dest_offset-32+content_len = dest_offset+content_len-8 w prawo
+
+    //dest_offset+content_len-0x8
+
+    size_t dest_shift = 0x0;
+
+    if(dest_offset+content_len>0x8){
+        *dest |= (uchar)(content >> (dest_offset+content_len-0x8));
+    }
+    else {
+        *dest |= (uchar)(content << (0x8-dest_offset-content_len));
+    }
+    dest++; dest_shift++;
+
+
+    if(content_len>(0x8-dest_offset)){//
+        uchar n = (content_len-(0x8-dest_offset)) >> 0x3;
+
+        //if(content_len-(0x8-dest_offset)-n) n++; // :)
+        if((content_len-(0x8-dest_offset))%8) n++;
+
+        //std::cout << "n=" << (int)n << std::endl;
+
+        for(uchar i=0x0; i<n; i++){
+            // w lewo o 32-content_len
+            // w lewo o 8-dest_offset
+            // w lewo o 8*i
+            // w prawo o 24
+                                    /// 24-32+content_len-8+dest_offset-8*i = content_len+dest_offset-16-8*i
+            /*
+                 x  x  x  x  x  x  x  x    x  x  x  x  c0 c1 c2   c3 c4 c5 c6 c7 c8 c9 c10   c11 c12 c13 c14 c15 c16 c17 c18     u
+                 32-19=13
+                 c0 c1 c2 c3 c4 c5 c6 c7   c8 c9 c10 c11 c12 c13 c14 c15   c16 c17 c18 0 0 0 0 0    u<<=13
+                 c4 c5 c6 c7 c8 c9 c10 c11    c12 c13 c14 c15 c16 c17 c18 0     00000000 00000000   u<<=4
+
+
+
+            */
+
+            // wynikowo: w prawo o 24-32-8+dest_offset+content_len-8*i
+            // czyli: w prawo o dest_offset+content_len-16-8*i
+            // czyli:  w prawo o dest_offset+content_len-2*(8+i)
+
+            //*dest = content >> (dest_offset+content_len-16-8*i); break;
+
+            if((dest_offset+content_len) > ((0x2+i)<<0x3)  /* dest_offset+content_len > 16+8*i */){
+                //std::cout << "I condition" << std::endl;
+                *dest++ = content >> (dest_offset+content_len-(((0x2+i))<<0x3));
+                //*dest = content >> (dest_offset+content_len-16-8*i);
+                //dest++;
+            }
+            else {
+                //std::cout << "II condition" << std::endl;
+                *dest++ = content << ((((0x2+i))<<0x3)-dest_offset-content_len);
+                //*dest = content << (16+8*i-dest_offset-content_len);
+                //dest++;
+            }
+            dest_shift++;
+
+        }
+
+
+
+
+
+    }
+
+    dest_offset = (dest_offset+content_len)%0x8;
+    if(dest_offset) {dest--; dest_shift--; }
+
+    // (content_len - (8-dest_offset))%8
+
+
+
+
+
+
+    return dest_shift;
+}
+
+
 
 /*void encode(uchar* input_data, uchar* output_data, const size_t& len){
 
 }*/
 
 void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len){
-    //std::cout << "Start encodec" << std::endl;
+
+    /*std::cout << "<input_data>" << std::endl;
+    printbp(input_data, input_len*8);
+    std::cout << "</input_data>" << std::endl;
+    std::cout << "<input_len>" << input_len << "</input_len>" << std::endl;
+    std::cout << "<n>" << (int)n << "</n>" << std::endl;
+    std::cout << "<symbol_buffer>" << std::endl;
+    printbp(symbol_buffer, n*8);
+    std::cout << "</symbol_buffer>" << std::endl;*/
+
     exnode* leaf_buffer = new exnode[0x100];
-    //std::cout << "Bef ETREE call" << std::endl;
-
-
 
     hman_etree(symbol_buffer, freq_buffer, n, leaf_buffer);
-    //std::cout << "Aft ETREE call" << std::endl;
 
     uchar* input_head = input_data;
     uchar* input_tail = input_data+input_len;
 
-    //std::cout << "bef memset" << std::endl;
     memset(output_data, 0, input_len); // ! - not 0x100
-    //std::cout << "aft memset" << std::endl;
 
     uchar* output_head = output_data;
     uchar output_offset = 0x0;
@@ -117,80 +209,49 @@ void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
     uchar h = 0x0;
     output_len = 0x1;
 
-    /*inside_checker(*input_data == 0x44, "*input_data == 0x44");
-    inside_checker(*(input_data+1) == 0x88, "*(input_data+1) == 0x88");
-    inside_checker(*(input_data+2) == 0x66, "*(input_data+2) == 0x66");*/
-
     while(input_head != input_tail){
+        /*getchar();
+        std::cout << "<input_index>" << (int)(input_head-input_data) << "</input_index>" << std::endl;*/
         relay = *(leaf_buffer+*input_head);
         code = 0x0;
         h = 0x0;
-        /*std::cout << "relayup start" << std::endl;
-        if(input_head == input_data){
-            inside_checker(relay->up->up->up == NULL, "relay->up->up->up == NULL for leaf 0x44");
-        }
-        else if(input_head == input_data+1){
-            inside_checker(relay->up->up->up == NULL, "relay->up->up->up == NULL for leaf 0x88");
-        }
-        else if(input_head == input_data+2){
-            inside_checker(relay->up->up == NULL, "relay->up->up == NULL for leaf 0x66");
-        }*/
-        //conditional_inside_checker(input_head == input_data+1, relay->up->up->up == NULL, "relay->up->up->up == NULL for leaf 0x88");
-        //conditional_inside_checker(input_head == input_data+2, relay->up->up == NULL, "relay->up->up == NULL for leaf 0x66");
 
         while(relay->up){
-            //print_exnode(relay);
-            //inside_checker(relay->up->up == NULL, "relay->up->up == NULL");
 
             code |= (relay->polarity) << h++;
             relay = relay->up;
-            //std::cout << "(" << (int)h << ")" << std::endl;
         }
 
-        /*expected_conditional_inside_checker(input_head == input_data, h==0x2, "2", std::to_string(h).c_str(), "Length of code for 0x44");
-        expected_conditional_inside_checker(input_head == input_data+1, h==0x2, "2", std::to_string(h).c_str(), "Length of code for 0x88");
-        expected_conditional_inside_checker(input_head == input_data+2, h==0x1, "1", std::to_string(h).c_str(), "Length of code for 0x66");
-
-        printu(code);
-
-        std::cout << "relayup end" << std::endl;*/
-
-        /*code << 0x20-h;
-        *output_head |= code >> (0x18+output_offset);*/
-
-
-        code <<= 0x20-h;
-
-        //std::cout << "maploop start" << std::endl;
-        while(h>=0x8-output_offset){
-            //std::cout << "OVERFLOWING" << std::endl;
-            h -= 0x8-output_offset;
-            *output_head++ |= (code >> (0x18+output_offset));
-            output_len++;
-            output_offset = 0x0;
-            code <<= 0x8-output_offset;
-        }
-
-
-
-        //std::cout << "maploop end" << std::endl;
-
-
-        *output_head |= (code >> (0x18+output_offset));
-        //std::cout << "xdc" << std::endl;
-        output_offset += h;
-
-
-        /*h -= 0x8-output_offset;
-        code << 0x8-output_offset;
-        while(h!=0x0){
-            *(++output_head) |= code >> 0x18;
-            if(h>0x8){
-
-            }
+        /*code |= (relay->polarity) << h++;
+        while(relay = relay->up){
+            code |= (relay->polarity) << h++;
         }*/
-        /*std::cout << output_len << std::endl;
-        printbp(output_data, output_len*8);*/
+
+        /*std::cout << "<symbol>0x" << std::hex << (int)*input_head << std::dec << "(" << *input_head << ")</symbol>" << std::endl;
+        std::cout << "<code h='" << (int)h << "'>" << std::endl;
+        printu(code);
+        std::cout << "</code>" << std::endl;*/
+
+
+        /* Tu jest blad bo code moze byc teoretycznie na 32 bitach */
+        //code <<= 0x20-h;
+
+        ////uchar inject(uchar*& dest, uint content, uchar content_len, uchar dest_offset)
+        ////size_t inject(uchar*& dest, const uint& content, const uchar& content_len, const uchar& dest_offset_in, uchar& dest_offset_out)
+        //size_t inject(uchar*& dest, const uint& content, const uchar& content_len, uchar& dest_offset)
+
+        /*std::cout << "<output_head>";
+        printf("%p", output_head);
+        std::cout << "</output_head>" << std::endl;*/
+        output_len += inject(output_head, code, h, output_offset);
+
+        /*std::cout << "<output_data>" << std::endl;
+        //printbp(output_data, 8*(input_len+0x1));
+        std::cout << "</output_data>" << std::endl;
+
+        std::cout << "<output_offset>" << (int)output_offset << "</output_offset>" << std::endl;*/
+
+
 
         input_head++;
 
@@ -198,13 +259,22 @@ void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
     /*if(output_offset){
         output_len++;
     }*/
-    if(output_offset==0x0) output_len--;
+    //if(!output_offset) output_len--;
 
 
     ///<append output offset byte>
-    *(output_data+output_len) = output_offset == 0x0 ? 0x8 : output_offset;
-    output_len++;
+    if(output_offset){
+        *(output_data+output_len) = output_offset;
+        output_len++;
+    }
+    else *(output_data+output_len-0x1) = 0x8;
+
     ///</append output offset byte>
+
+
+    /*std::cout << "<output>" << std::endl;
+    printbp(output_data, 8*output_len);
+    std::cout << "</output>" << std::endl;*/
 
     //std::cout << "end encodec" << std::endl;
 }
@@ -225,6 +295,10 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
 
 
     dnode root = hman_dtree(symbol_buffer, freq_buffer, n);
+
+    /*SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8); //blue
+    printBT(&root, nullptr);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //green*/
 
 
     /*inside_checker(*input_data == 0x18, "");
@@ -280,6 +354,8 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
     }
 
     while(input_head != input_tail-1){
+        /*std::cout << "INPUT_INDEX=" << (int)(input_head-input_data) << std::endl;
+        std::cout << "Decoding..." << std::endl;*/
         //std::cout << "Decodec iter" << std::endl;
         breakout = 0x0;
 
@@ -288,27 +364,41 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
         //std::cout << (int)max_offset << std::endl;
 
         while(input_offset < max_offset){
-            if((*input_head>>(0x7-input_offset))&0x1){
 
+            //std::cout << "INPUT_OFFSET=" << (int)input_offset << std::endl;
+            if((*input_head>>(0x7-input_offset))&0x1){
+                //Sleep(10); //system("cls");
+                //std::cout << "RIGHT" << std::endl;
+                //printBT(&root, dnode_head->right);
                 if(dnode_head->right->symbol){
+                    //std::cout << "SYMBOL [" << *(dnode_head->right->symbol) << "]" << std::endl;
                     *output_head = *(dnode_head->right->symbol);
                     output_len++;
                     output_head++;
                     breakout = 0x1;
                     dnode_head = &root;
+                    //getchar();
                 }
                 else dnode_head = dnode_head->right;
+
+
             }
             else {
-
+                //Sleep(10); //system("cls");
+                //std::cout << "LEFT" << std::endl;
+                //printBT(&root, dnode_head->left);
                 if(dnode_head->left->symbol){
+                    //std::cout << "SYMBOL [" << *(dnode_head->left->symbol) << "]" << std::endl;
                     *output_head = *(dnode_head->left->symbol);
                     output_len++;
                     output_head++;
                     breakout = 0x1;
                     dnode_head = &root;
+                    //getchar();
                 }
                 else dnode_head = dnode_head->left;
+
+
             }
             input_offset++;
             if(breakout){
@@ -321,7 +411,8 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
         }
 
     }
-    /*std::cout << "OUTPUT_LEN" << std::endl;
+
+    /*std::cout << "[DECODED]OUTPUT_LEN" << std::endl;
     std::cout << (int)output_len << std::endl;
     std::cout << "OUTPUT" << std::endl;
     printbp(output_data, 8*output_len);*/

@@ -4,6 +4,7 @@
 #include "code_fio.h"
 
 #include "tests.h"
+#include <windows.h>
 
 //g++ main.cpp net.cpp -o hman -lws2_32
 
@@ -36,10 +37,14 @@ void usage(char* argv0){
     checker(test_encodec(), "encodec");
     checker(test_decodec(), "decodec");
 
+    checker(test_inject(), "inject");
+
 }
 
 int main(int argc, char** argv)
 {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //green
+
     if(argc<2){ usage(*argv); return 0; }
 
     if(!strcmp("-t", argv[1])){

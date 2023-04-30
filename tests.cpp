@@ -1,6 +1,15 @@
 #include <iostream>
+#include <cstring>
 #include "code.h"
 #include "hman.h"
+
+
+
+/*
+    TEST  -d C:\Users\amade\test_hman_transmit\plik.a C:\Users\amade\test_hman_transmit\plik_decoded.txt C:\Users\amade\test_hman_transmit\plik.b
+
+    TEST -d C:\Users\amade\test_hman_transmit\g.a C:\Users\amade\test_hman_transmit\g_decoded.txt C:\Users\amade\test_hman_transmit\g.b
+*/
 
 typedef unsigned char uchar;
 typedef unsigned long long ull;
@@ -243,7 +252,7 @@ uchar test_hman_dtree(){
 
 //void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* leaf_buffer)
 
-uchar test_hman_etree(){
+uchar test_hman_etree(){//return 0x1;
 
     /* TEST 1 */
 
@@ -391,7 +400,7 @@ uchar test_symfreq_catalogue(){
 }
 
 //void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len);
-uchar test_encodec(){ //return 0x0;
+uchar test_encodec(){//return 0x0;
     /* TEST 1 */
 
     uchar* input_data = new uchar[0x3];
@@ -414,18 +423,20 @@ uchar test_encodec(){ //return 0x0;
     uchar* output_data = new uchar[input_len+0x1];
     size_t output_len = 0x0;
 
-    std::cout << "Bef encodec call" << std::endl;
+    //std::cout << "Bef encodec call" << std::endl;
     encodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
-    std::cout << "Aft encodec call" << std::endl;
+    //std::cout << "Aft encodec call" << std::endl;
 
     uchar retval = 0x1;
-    std::cout << "Conditions" << std::endl;
-    std::cout << output_len << std::endl;
+    //std::cout << "Conditions" << std::endl;
+    std::cout << "<output_len>" << output_len << "</output_len>" << std::endl;
     if(output_len != 0x2) retval = 0x0;
     else if(((*output_data) & 0xf8) != 0x18) retval = 0x0;
     else if(*(output_data+1) != 0x5) retval = 0x0;
 
-    printbp(output_data, 8);
+    std::cout << "<output_data>" << std::endl;
+    printbp(output_data, output_len*8);
+    std::cout << "</output_data>" << std::endl;
 
     delete[] input_data;
     delete[] symbol_buffer;
@@ -434,7 +445,7 @@ uchar test_encodec(){ //return 0x0;
 
     /* TEST 2 */
 
-    std::cout << "--Test 2--" << std::endl;
+    //std::cout << "--Test 2--" << std::endl;
 
     input_data = new uchar[0x3];
     *input_data = 0x61;
@@ -456,13 +467,16 @@ uchar test_encodec(){ //return 0x0;
     output_data = new uchar[input_len+0x1];
     output_len = 0x0;
     encodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
-    std::cout << "Conditions (II)" << std::endl;
+    //std::cout << "Conditions (II)" << std::endl;
     if(output_len != 0x2) retval = 0x0;
     else if(((*output_data)&0xf8) != 0xb0) retval = 0x0;
     else if(*(output_data+1) != 0x5) retval = 0x0;
 
-    std::cout << "output2" << std::endl;
-    printbp(output_data, 8);
+    //std::cout << "output2" << std::endl;
+    std::cout << "<output_len>" << output_len << "</output_len>" << std::endl;
+    std::cout << "<output_data>" << std::endl;
+    printbp(output_data, output_len*8);
+    std::cout << "</output_data>" << std::endl;
 
     delete[] input_data;
     delete[] symbol_buffer;
@@ -474,7 +488,7 @@ uchar test_encodec(){ //return 0x0;
 }
 
 //void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len)
-uchar test_decodec(){
+uchar test_decodec(){//return 0x1;
     /* Test 1 */
 
     std::cout << "Test decodec" << std::endl;
@@ -559,6 +573,70 @@ uchar test_decodec(){
     delete[] freq_buffer;
     delete[] input_data;
     delete[] output_data;
+
+    return retval;
+}
+
+////uchar inject(uchar* dest, uint content, uchar content_len, uchar dest_offset)
+////size_t inject(uchar*& dest, const uint& content, const uchar& content_len, const uchar& dest_offset_in, uchar& dest_offset_out)
+//size_t inject(uchar*& dest, const uint& content, const uchar& content_len, uchar& dest_offset)
+uchar test_inject(){//return 0x1;
+    /* V-TEST 1 */
+    uchar* buff = new uchar[0xa];
+    memset(buff, 0, 0xa);
+    uint content = 0b1011011101111000101; //0b1011 01110111 1000101
+    uchar content_len = 0x13;
+    uchar dest_offset = 0x4;
+    uchar* dest = buff+0x2;
+
+    printbp(buff, 80);
+    uchar retinj = inject(dest, content, content_len, dest_offset);
+    uchar retval = 0x1;
+
+    printbp(buff, 80);
+    std::cout << "RETINJ: " << (int)retinj << std::endl;
+
+    delete[] buff;
+
+    /* V-TEST 2 */
+
+    buff = new uchar[0xa];
+    memset(buff, 0, 0xa);
+    content = 0b101; //0b1011 01110111 1000101
+    content_len = 0x3;
+    dest_offset = 0x4;
+    dest = buff+0x2;
+
+    printbp(buff, 80);
+    retinj = inject(dest, content, content_len, dest_offset);
+
+    printbp(buff, 80);
+    std::cout << "RETINJ: " << (int)retinj << std::endl;
+
+    retinj = inject(dest, content, content_len, dest_offset);
+    printbp(buff, 80);
+    std::cout << "RETINJ: " << (int)retinj << std::endl;
+
+    delete[] buff;
+
+    /* V-TEST 3 */
+    std::cout << "V-TEST 3" << std::endl;
+
+    buff = new uchar[0xf];
+    memset(buff, 0, 0xf);
+    content = 0b11011; //0b1011 01110111 1000101
+    content_len = 0x5;
+    dest_offset = 0x5;
+    dest = buff+0xc;
+
+    printbp(buff, 0xf<<0x3);
+    retinj = inject(dest, content, content_len, dest_offset);
+
+    printbp(buff, 0xf<<0x3);
+    std::cout << "RETINJ: " << (int)retinj << std::endl;
+
+    delete[] buff;
+
 
     return retval;
 }

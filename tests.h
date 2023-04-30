@@ -4,6 +4,7 @@
 #include <iostream>
 #include "code.h"
 #include "hman.h"
+#include <cstring>
 
 //enum NODEDIR;
 
@@ -50,5 +51,9 @@ uchar test_hman_etree();
 uchar test_encodec();
 
 uchar test_decodec();
+
+
+
+uchar test_inject();
 
 #endif // TESTS_H_INCLUDED
