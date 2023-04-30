@@ -41,7 +41,8 @@ void print_exnode(exnode node){
 
 
 
-dxnode* min_dxnode(dxnode* buffer, uchar len){
+dxnode* min_dxnode(dxnode* buffer, uchar _len){
+    ushort len = _len ? _len : 0x100; //
     ///<debug print arg>
     /*std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     for(int i=0; i<len; i++){
@@ -91,7 +92,8 @@ dxnode* min_dxnode(dxnode* buffer, uchar len){
     return _min_dxnode;
 }
 // return 0x1 if it is the only non-null exnode
-uchar min_exnode(exnode* buffer, exnode*& minptr, uchar len){
+uchar min_exnode(exnode* buffer, exnode*& minptr, uchar _len){
+    ushort len = _len ? _len : 0x100; //
     ///<debug print arg>
     /*std::cout << "=+=+=++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=" << std::endl;
     for(int i=0; i<len; i++){
@@ -162,7 +164,7 @@ uchar min_exnode(exnode* buffer, exnode*& minptr, uchar len){
 
 
 
-dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
+dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& _n){
 
     /*
         0x44    *symbol_buffer
@@ -176,6 +178,8 @@ dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
         0x3     n
 
     */
+
+    ushort n = _n ? _n : 0x100; //
 
     dxnode* dxnode_buffer = new dxnode[n];
     dxnode* dxnode_head = dxnode_buffer;
@@ -222,14 +226,14 @@ dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
         return root;
 
     }
-    else if(n<0x1){
+    /*else if(n<0x1){
         dnode root;
         root.symbol = NULL;
         root.left = NULL;
         root.freq = 0x0;
         root.right = NULL;
         return root;
-    }
+    }*/
 
     while(true){
         ///<debug print>
@@ -240,7 +244,7 @@ dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
         std::cout << "#################################" << std::endl;*/
         ///</debug print>
         dxnode couple = new dnode;
-        dxnode* min1 = min_dxnode(dxnode_buffer, n);
+        dxnode* min1 = min_dxnode(dxnode_buffer, _n);
         couple->symbol = NULL;
         couple->left = *min1;
         couple->freq = (*min1)->freq;
@@ -249,7 +253,7 @@ dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
         //(*min1)->up = couple; //check
 
         *min1 = NULL; //check
-        dxnode* min2 = min_dxnode(dxnode_buffer, n);
+        dxnode* min2 = min_dxnode(dxnode_buffer, _n);
         if(min2){
             couple->right = *min2;
             couple->freq += (*min2)->freq;
@@ -371,8 +375,8 @@ dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n){
     //*min_xnode(xnode_buffer, n) = NULL;
 }
 
-void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* leaf_buffer){
-
+void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& _n, exnode* leaf_buffer){
+    ushort n = _n ? _n : 0x100; //
 
     uchar* symbol_head = symbol_buffer;
     uchar* symbol_tail = symbol_head+n;
@@ -425,7 +429,7 @@ void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* 
 
         exnode* min1;
         //std::cout << "Bef min" << std::endl;
-        if(min_exnode(exnode_buffer, min1, n)){
+        if(min_exnode(exnode_buffer, min1, _n)){
             (*min1)->up = NULL;
             //std::cout << "LAAST" << std::endl;
             break;
@@ -441,7 +445,7 @@ void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* 
         *min1 = NULL; //check
 
         exnode* min2;
-        /*stay = !*/min_exnode(exnode_buffer, min2, n);
+        /*stay = !*/min_exnode(exnode_buffer, min2, _n);
         /*if(!stay){
             //(*min2)->up = NULL;
             std::cout << "!stay" << std::endl;

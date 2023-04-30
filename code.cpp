@@ -30,7 +30,7 @@ typedef unsigned long long ull;
 */
 
 
-void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_buffer, ull* freq_buffer, uchar& uniq_symbol_cnt){
+void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_buffer, ull* freq_buffer, uchar& uniq_symbol_cnt){//here debug + ip
     uchar* dhead = data_buffer;
     uchar* dtail = data_buffer+data_len;
     ull* fhead = freq_buffer;
@@ -85,6 +85,8 @@ void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_bu
     //printbp(symbol_buffer, 40);
 
     delete[] nullfreq;
+
+    std::cout << "<Uniq symbol cnt> " << (int)uniq_symbol_cnt << "</Uniq symbol cnt>" << std::endl;
 
 }
 
@@ -195,6 +197,8 @@ void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
 
     hman_etree(symbol_buffer, freq_buffer, n, leaf_buffer);
 
+    //printBT()
+
     uchar* input_head = input_data;
     uchar* input_tail = input_data+input_len;
 
@@ -296,9 +300,9 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
 
     dnode root = hman_dtree(symbol_buffer, freq_buffer, n);
 
-    /*SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8); //blue
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8); //blue
     printBT(&root, nullptr);
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //green*/
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //green
 
 
     /*inside_checker(*input_data == 0x18, "");

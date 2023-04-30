@@ -16,7 +16,8 @@ typedef unsigned short ushort;
 
 }*/
 
-void store_symfreq(const char* dest_path, uchar* symbol_buffer, ull* freq_buffer, const uchar& uniq_symbol_cnt){
+void store_symfreq(const char* dest_path, uchar* symbol_buffer, ull* freq_buffer, const uchar& _uniq_symbol_cnt){
+    ushort uniq_symbol_cnt = _uniq_symbol_cnt ? _uniq_symbol_cnt : 0x100;
     /*uchar* symbol_buffer = new uchar[0x100];
     ull* freq_buffer = new ull[0x100];
     uchar uniq_symbol_cnt;
@@ -81,11 +82,14 @@ void load_symfreq(const char* source_path, uchar* symbol_buffer, ull* freq_buffe
 
     uchar* sbuff_head = sbuff;
     n = *sbuff_head++;
-    memcpy(symbol_buffer, sbuff_head, n);
-    sbuff_head += n;
+
+    ushort ns = n ? n : 0x100; //
+
+    memcpy(symbol_buffer, sbuff_head, ns);
+    sbuff_head += ns;
 
     ull* freq_head = freq_buffer;
-    ull* freq_tail = freq_buffer+n;
+    ull* freq_tail = freq_buffer+ns;
     while(freq_head != freq_tail){
         *freq_head++ = (ull)*(sbuff_head+7) | ((ull)*(sbuff_head+6)<<0x8) | ((ull)*(sbuff_head+5)<<0x10) | ((ull)*(sbuff_head+4)<<0x16) | ((ull)*(sbuff_head+3)<<0x20) | ((ull)*(sbuff_head+2)<<0x28) | ((ull)*(sbuff_head+1)<<0x30) | ((ull)*sbuff_head<<0x38);
         sbuff_head += 0x8;
@@ -208,9 +212,9 @@ void encode_file_compact(const char* source_path, const char* dest_path){ // hma
     symfreq_catalogue(sbuff, sbuff_size, symbol_buffer, freq_buffer, uniq_symbol_cnt);
 
 
+    ushort uniq_symbol_cnt_s = uniq_symbol_cnt ? uniq_symbol_cnt : 0x100; //
 
-
-    size_t dbuff_size = sbuff_size+0x9*uniq_symbol_cnt+0x1;
+    size_t dbuff_size = sbuff_size+0x9*uniq_symbol_cnt_s+0x1;
     uchar* dbuff = new uchar[dbuff_size];
 
     uchar* dbuff_head = dbuff;
@@ -218,11 +222,14 @@ void encode_file_compact(const char* source_path, const char* dest_path){ // hma
 
 
     *dbuff_head++ = uniq_symbol_cnt;
-    memcpy(dbuff_head, symbol_buffer, uniq_symbol_cnt);
-    dbuff_head += uniq_symbol_cnt;
+
+
+
+    memcpy(dbuff_head, symbol_buffer, uniq_symbol_cnt_s);
+    dbuff_head += uniq_symbol_cnt_s;
 
     ull* freq_head = freq_buffer;
-    ull* freq_tail = freq_buffer+uniq_symbol_cnt;
+    ull* freq_tail = freq_buffer+uniq_symbol_cnt_s;
     while(freq_head != freq_tail){
         *dbuff_head++ = (uchar)(*freq_head>>0x38);
         *dbuff_head++ = (uchar)((*freq_head>>0x30) & 0xff);
@@ -239,7 +246,7 @@ void encode_file_compact(const char* source_path, const char* dest_path){ // hma
 
     encodec(sbuff, sbuff_size, symbol_buffer, freq_buffer, uniq_symbol_cnt, dbuff_head, output_len);
 
-    store_data(dest_path, dbuff, 0x9*uniq_symbol_cnt+0x1+output_len);
+    store_data(dest_path, dbuff, 0x9*uniq_symbol_cnt_s+0x1+output_len);
 
 }
 
@@ -258,11 +265,16 @@ void decode_file_compact(const char* source_path, const char* dest_path){ // hma
 
     uchar* sbuff_head = sbuff;
     n = *sbuff_head++;
-    memcpy(symbol_buffer, sbuff_head, n);
-    sbuff_head += n;
+
+    ushort ns = n ? n : 0x100; //
+
+    std::cout << "<ns>" << ns << "</ns>" << std::endl;
+
+    memcpy(symbol_buffer, sbuff_head, ns);
+    sbuff_head += ns;
 
     ull* freq_head = freq_buffer;
-    ull* freq_tail = freq_buffer+n;
+    ull* freq_tail = freq_buffer+ns;
     while(freq_head != freq_tail){
         *freq_head++ = (ull)*(sbuff_head+7) | ((ull)*(sbuff_head+6)<<0x8) | ((ull)*(sbuff_head+5)<<0x10) | ((ull)*(sbuff_head+4)<<0x16) | ((ull)*(sbuff_head+3)<<0x20) | ((ull)*(sbuff_head+2)<<0x28) | ((ull)*(sbuff_head+1)<<0x30) | ((ull)*sbuff_head<<0x38);
         sbuff_head += 0x8;
@@ -272,7 +284,7 @@ void decode_file_compact(const char* source_path, const char* dest_path){ // hma
     uchar* output = new uchar[sbuff_size];
     size_t output_len;
 
-    decodec(sbuff_head, sbuff_size-0x9*n-0x1, symbol_buffer, freq_buffer, n, output, output_len);
+    decodec(sbuff_head, sbuff_size-0x9*ns-0x1, symbol_buffer, freq_buffer, n, output, output_len);
     store_data(dest_path, output, output_len);
 
     delete[] sbuff;

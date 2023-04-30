@@ -24,7 +24,7 @@ void printBT(const std::string& prefix, dnode* node, bool isLeft, dnode* marker)
 
 
         if(node->symbol){
-            std::cout << "0x" << std::hex << (int)*(node->symbol) << std::dec << "(" << *(node->symbol) << ")" << std::endl;
+            std::cout << "0x" << std::hex << (int)*(node->symbol) << std::dec << "(" /*<< *(node->symbol)*/ << ")" << std::endl;
         }
         else {
             std::cout << node->freq << std::endl;
@@ -54,3 +54,4 @@ void printBT(dnode* node, dnode* marker)
     printBT("", node, false, marker);
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //green
 }
+
