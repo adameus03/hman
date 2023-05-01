@@ -57,7 +57,7 @@ const uchar ACK = 0xa;
     std::cout << std::endl;
 }*/
 
-void transmit_file(const char* source_path){ // hman -t source_path
+void transmit_file(const char* source_path, const char* local_ip_addr, const int& local_port){ // hman -t source_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
     size_t sbuff_size = f_in_pbuf->pubseekoff(0, f_in.end, f_in.in);
@@ -66,7 +66,7 @@ void transmit_file(const char* source_path){ // hman -t source_path
     f_in_pbuf->sgetn((char*)sbuff, sbuff_size);
     f_in.close();
 
-    SOCKET s = get_socket_as_server();
+    SOCKET s = get_socket_as_server(local_ip_addr, local_port);
 
     std::cout << "sbuff_size: " << sbuff_size << std::endl;
 
@@ -110,9 +110,9 @@ void transmit_file(const char* source_path){ // hman -t source_path
 
 }
 
-void receive_file(const char* dest_path, const char* ip_addr){ //hman -r dest_path ip_addr
+void receive_file(const char* dest_path, const char* remote_ip_addr, const int& remote_port){ //hman -r dest_path ip_addr
     std::cout << "Before get_socket_as_client" << std::endl;
-    SOCKET s = get_socket_as_client(ip_addr);
+    SOCKET s = get_socket_as_client(remote_ip_addr, remote_port);
     std::cout << "After get_socket_as_client" << std::endl;
     uchar* sz_blk = new uchar[8];
     recv(s, (char*)sz_blk, 8, 0);

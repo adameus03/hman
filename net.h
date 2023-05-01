@@ -3,9 +3,9 @@
 
 #include <winsock2.h>
 
-SOCKET get_socket_as_server();
+SOCKET get_socket_as_server(const char* local_ip_addr, const int& local_port);
 
-SOCKET get_socket_as_client(const char* ip_addr);
+SOCKET get_socket_as_client(const char* remote_ip_addr, const int& remote_port);
 
 
 #endif // NET_H_INCLUDED
