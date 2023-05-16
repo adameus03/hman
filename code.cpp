@@ -357,9 +357,10 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
         return;
     }
 
-    while(input_head != input_tail-1){
-        /*std::cout << "INPUT_INDEX=" << (int)(input_head-input_data) << std::endl;
-        std::cout << "Decoding..." << std::endl;*/
+    //ull input_counter = 0x0;
+    while(input_head != input_tail-1/*input_counter<input_len*/){
+        //std::cout << "INPUT_INDEX=" << (int)(input_head-input_data) << std::endl;
+        //std::cout << "Decoding..." << std::endl;
         //std::cout << "Decodec iter" << std::endl;
         breakout = 0x0;
 
@@ -410,10 +411,11 @@ void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
             }
         }
         if(/*(!breakout) || */input_offset==max_offset){
-            input_offset = 0x0;
-            input_head++;
-        }
 
+            input_offset = 0x0;
+            input_head++; //input_counter++; //#
+        }
+        //std::cout << "Decode iteration end" << std::endl;
     }
 
     /*std::cout << "[DECODED]OUTPUT_LEN" << std::endl;

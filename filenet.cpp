@@ -11,7 +11,7 @@
     SIZE = 8B of file size
     ACK  = 0xa
 
-
+    OLD:
     TX  8B      SIZE
     RX  1B      ACK
     TX  1024B   BLK
@@ -21,6 +21,14 @@
     TX  1024B   BLK
     ...
     RX  1B      ACK
+    TX  1024B   BLK
+
+    NEW:
+    TX  8B      SIZE
+    TX  1024B   BLK
+    TX  1024B   BLK
+    TX  1024B   BLK
+    ...
     TX  1024B   BLK
 
 */
@@ -92,12 +100,12 @@ void transmit_file(const char* source_path, const char* local_ip_addr, const int
     uchar c;
 
     for(ull u=0x0; u<sbuff_size; u+=BLK_SIZE){
-        recv(s, (char*)&c, 1, 0);
+        /*recv(s, (char*)&c, 1, 0);
         if(c == ACK) std::cout << "Received ACK" << std::endl;
         else {
             std::cerr << "Received invalid acknowledgement from receiver!" << std::endl;
             throw;
-        }
+        }*/
         std::cout << "Sending block" << std::endl;
         printbp(sbuff+u, BLK_SIZE);
         send(s, (const char*)(sbuff+u), BLK_SIZE, 0); //int
@@ -138,8 +146,8 @@ void receive_file(const char* dest_path, const char* remote_ip_addr, const int& 
 
 
     for(ull u=0x0; u<dbuff_size; u+=BLK_SIZE){
-        send(s, (const char*)&ACK, 1, 0);
-        std::cout << "Sent ACK" << std::endl;
+        /*send(s, (const char*)&ACK, 1, 0);
+        //std::cout << "Sent ACK" << std::endl;*/
         std::cout << "Receiving block..." << std::endl;
         recv(s, (char*)(dbuff+u), BLK_SIZE, 0); //int
         //printbp(dbuff+u,BLK_SIZE);

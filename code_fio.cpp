@@ -179,8 +179,19 @@ void decode_file_distinct(const char* source_path, const char* dest_path, const 
     uchar n;
     load_symfreq(symfreq_path, symbol_buffer, freq_buffer, n);
 
-    uchar* output = new uchar[sbuff_size];
-    size_t output_len;
+
+    ushort ns = n?n:0x100;
+    size_t output_len = 0x0;
+    ull* freq_buffer_head = freq_buffer;
+    ull* freq_buffer_tail = freq_buffer+ns;
+    while(freq_buffer_head != freq_buffer_tail){
+        output_len += *freq_buffer_head++;
+    }
+
+
+
+    uchar* output = new uchar[/*sbuff_size*/output_len];
+    //size_t output_len;
 
     /*std::cout << "<SBUFF_SIZE>" << std::endl;
     std::cout << sbuff_size << std::endl;
@@ -281,8 +292,18 @@ void decode_file_compact(const char* source_path, const char* dest_path){ // hma
     }
 
 
-    uchar* output = new uchar[sbuff_size];
-    size_t output_len;
+
+    size_t output_len = 0x0;
+    ull* freq_buffer_head = freq_buffer;
+    ull* freq_buffer_tail = freq_buffer+ns;
+    while(freq_buffer_head != freq_buffer_tail){
+        output_len += *freq_buffer_head++;
+    }
+
+
+
+    uchar* output = new uchar[/*sbuff_size*/output_len];
+    //size_t output_len;
 
     decodec(sbuff_head, sbuff_size-0x9*ns-0x1, symbol_buffer, freq_buffer, n, output, output_len);
     store_data(dest_path, output, output_len);
