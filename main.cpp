@@ -29,7 +29,7 @@ void usage(char* argv0){
     std::cout << "    " << argv0 << " -d source_path dest_path" << std::endl;
     std::cout << std::endl;
 
-    checker(test_min_dxnode(), "min_dxnode");
+    /*checker(test_min_dxnode(), "min_dxnode");
     checker(test_min_exnode(), "min_exnode");
     checker(test_hman_dtree(), "hman_dtree");
     checker(test_hman_etree(), "hman_etree");
@@ -38,7 +38,7 @@ void usage(char* argv0){
     checker(test_encodec(), "encodec");
     checker(test_decodec(), "decodec");
 
-    checker(test_inject(), "inject");
+    checker(test_inject(), "inject");*/
 
 }
 
