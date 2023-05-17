@@ -3,11 +3,8 @@
 #include <cstdlib>
 #include "filenet.h"
 #include "code_fio.h"
-
 #include "tests.h"
 #include <windows.h>
-
-//g++ main.cpp net.cpp -o hman -lws2_32
 
 using namespace std;
 
@@ -28,18 +25,6 @@ void usage(char* argv0){
     std::cout << "Huffman-decode a file with unknown symbol-frequency map" << std::endl;
     std::cout << "    " << argv0 << " -d source_path dest_path" << std::endl;
     std::cout << std::endl;
-
-    /*checker(test_min_dxnode(), "min_dxnode");
-    checker(test_min_exnode(), "min_exnode");
-    checker(test_hman_dtree(), "hman_dtree");
-    checker(test_hman_etree(), "hman_etree");
-
-    checker(test_symfreq_catalogue(), "symfreq_catalogue");
-    checker(test_encodec(), "encodec");
-    checker(test_decodec(), "decodec");
-
-    checker(test_inject(), "inject");*/
-
 }
 
 int main(int argc, char** argv)
@@ -78,7 +63,7 @@ int main(int argc, char** argv)
             std::cout << "Huffman-decode a file with unknown symbol-frequency map" << std::endl;
             decode_file_compact(argv[2], argv[3]);
         }
-        else if(argc==5){ //std::cout << "BINGO" << std::endl;
+        else if(argc==5){
             std::cout << "Huffman-decode file using a known symbol-frequency map" << std::endl;
             decode_file_distinct(argv[2], argv[3], argv[4]);
         }
@@ -87,28 +72,5 @@ int main(int argc, char** argv)
     else {
         usage(*argv); return 0;
     }
-
-
-    std::cout << "AFTER CONDITIONS" << std::endl;
-
-    /*cout << "Hello world!" << endl;
-    if(argc==3){
-        if(!strcmp(argv[1], "-r")){
-            cout << "Receiver mode" << endl;
-            receive_file(argv[2]);
-
-        }
-        else if(!strcmp(argv[1], "-t")){
-            cout << "Transmiter mode" << endl;
-            transmit_file(argv[2]);
-
-        }
-        else {
-            cout << "Invalid mode" << endl;
-        }
-    }
-    else {
-        cout << "Wrong # of args" << endl;
-    }*/
     return 0;
 }

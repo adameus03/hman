@@ -6,8 +6,6 @@
 #include "hman.h"
 #include <cstring>
 
-//enum NODEDIR;
-
 struct dnode;
 
 struct enode;

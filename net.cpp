@@ -11,8 +11,6 @@ SOCKET get_socket_as_server(const char* local_ip_addr, const int& local_port){
         throw;
     }
 
-
-
     SOCKET mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(mainSocket==INVALID_SOCKET)
     {
@@ -21,16 +19,11 @@ SOCKET get_socket_as_server(const char* local_ip_addr, const int& local_port){
         throw;
     }
 
-
-
     sockaddr_in service;
     memset(&service, 0, sizeof(service));
     service.sin_family = AF_INET;
     service.sin_addr.s_addr = inet_addr(local_ip_addr);
-    //service.sin_port = htons(27015);
     service.sin_port = htons(local_port);
-
-
 
     if(bind(mainSocket,(SOCKADDR*)&service, sizeof(service))==SOCKET_ERROR)
     {
@@ -39,14 +32,10 @@ SOCKET get_socket_as_server(const char* local_ip_addr, const int& local_port){
         throw;
     }
 
-
-
     if(listen(mainSocket, 1) == SOCKET_ERROR){
         printf("Error listening on socket.\n" );
         throw;
     }
-
-
 
     SOCKET acceptSocket = SOCKET_ERROR;
     printf("Waiting for a client to connect...\n");
@@ -70,8 +59,6 @@ SOCKET get_socket_as_client(const char* remote_ip_addr, const int& remote_port){
         throw;
     }
 
-
-
     SOCKET mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(mainSocket==INVALID_SOCKET)
     {
@@ -80,15 +67,11 @@ SOCKET get_socket_as_client(const char* remote_ip_addr, const int& remote_port){
         throw;
     }
 
-
-
     sockaddr_in service;
     memset(&service, 0, sizeof(service));
     service.sin_family = AF_INET;
     service.sin_addr.s_addr = inet_addr(remote_ip_addr);
     service.sin_port = htons(remote_port);
-
-
 
     if(connect(mainSocket,(SOCKADDR*)&service, sizeof(service))==SOCKET_ERROR)
     {
@@ -96,12 +79,7 @@ SOCKET get_socket_as_client(const char* remote_ip_addr, const int& remote_port){
         WSACleanup();
         throw;
     }
-    printf("Successfully connected to the server");
+    printf("Successfully connected to the server.\n");
 
     return mainSocket;
 }
-
-
-
-
-

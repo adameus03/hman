@@ -3,12 +3,9 @@
 #include "code.h"
 #include "hman.h"
 
-
-
 /*
     TEST  -d C:\Users\amade\test_hman_transmit\plik.a C:\Users\amade\test_hman_transmit\plik_decoded.txt C:\Users\amade\test_hman_transmit\plik.b
-
-    TEST -d C:\Users\amade\test_hman_transmit\g.a C:\Users\amade\test_hman_transmit\g_decoded.txt C:\Users\amade\test_hman_transmit\g.b
+    TEST  -d C:\Users\amade\test_hman_transmit\g.a C:\Users\amade\test_hman_transmit\g_decoded.txt C:\Users\amade\test_hman_transmit\g.b
 */
 
 typedef unsigned char uchar;
@@ -98,19 +95,6 @@ void print_exnode(exnode node){
     else std::cout << "NULL EXNODE" << std::endl;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //dxnode* min_dxnode(dxnode* buffer, uchar len)
 uchar test_min_dxnode(){
     dxnode* buffer = new dxnode[0x8];
@@ -135,13 +119,9 @@ uchar test_min_dxnode(){
     (*(buffer+6))->freq = 0x6;
     *(buffer+7) = NULL;
 
-    //std::cout << "I'm alive" << std::endl;
-
     dxnode* min1 = min_dxnode(buffer, 0x8);
-    //std::cout << "I'm alive 2" << std::endl;
     uchar retval = 0x1;
     if(min1 != buffer+3) retval = 0x0;
-    //delete[] buffer;
     return retval;
 }
 
@@ -174,10 +154,8 @@ uchar test_min_exnode(){
 
     uchar minret;
 
-    //std::cout << "I'm alive" << std::endl;
     exnode* min1;
     minret = min_exnode(buffer, min1, 0x8);
-    //std::cout << "I'm alive 2" << std::endl;
     uchar retval = 0x1;
     if(min1 != buffer+3) retval = 0x0;
     if(minret) retval = 0x0;
@@ -186,11 +164,6 @@ uchar test_min_exnode(){
     delete[] symbol_buffer;
 
     /* TEST 2 */
-
-    /*symbol_buffer = new uchar[0x3];
-    *symbol_buffer = 0x44;
-    *(symbol_buffer+1) = 0x88;
-    *(symbol_buffer+2) = 0x66;*/
 
     buffer = new exnode[0x3];
     *buffer = NULL;
@@ -222,15 +195,8 @@ uchar test_hman_dtree(){
     *(freq_buffer+2) = 0x3;
     uchar n = 0x3;
 
-    //std::cout << "bef call" << std::endl;
     dnode root = hman_dtree(symbol_buffer, freq_buffer, n);
-    //std::cout << "aft call" << std::endl;
-
-
     uchar retval = 0x1;
-
-    //printu(root.freq);
-
 
     if(root.freq != 0x6) retval = 0x0;
     if(root.symbol != NULL) retval = 0x0;
@@ -256,7 +222,7 @@ uchar test_hman_etree(){//return 0x1;
 
     /* TEST 1 */
 
-    /*uchar* symbol_buffer = new uchar[0x3];
+    uchar* symbol_buffer = new uchar[0x3];
     *symbol_buffer = 0x44;
     *(symbol_buffer+1) = 0x88;
     *(symbol_buffer+2) = 0x66;
@@ -301,32 +267,24 @@ uchar test_hman_etree(){//return 0x1;
 
     delete[] symbol_buffer;
     delete[] freq_buffer;
-    delete[] leaf_buffer;*/
+    delete[] leaf_buffer;
 
     std::cout << "etree test 2" << std::endl;
 
-    /* TEST 2 */ uchar retval = 0x1;
+    /* TEST 2 */ //uchar retval = 0x1;
 
-    uchar* symbol_buffer = new uchar[0x3];
+    symbol_buffer = new uchar[0x3];
     *symbol_buffer = 0x61;
     *(symbol_buffer+1) = 0x62;
     *(symbol_buffer+2) = 0x63;
-    ull* freq_buffer = new ull[0x3];
+    freq_buffer = new ull[0x3];
     *freq_buffer = 0x1;
     *(freq_buffer+1) = 0x1;
     *(freq_buffer+2) = 0x1;
-    uchar n = 0x3;
+    n = 0x3;
 
-    /*for(uchar i=0x0; i<n; i++){
-        printu(*(freq_buffer+i));
-    }*/
-
-    //exnode* leaf_buffer = new exnode[n];
-    exnode* leaf_buffer = new exnode[0x100]; // !
-
-    //std::cout << "Bef ecall" << std::endl;
+    leaf_buffer = new exnode[0x100]; // !
     hman_etree(symbol_buffer, freq_buffer, n, leaf_buffer);
-    //std::cout << "Aft ecall" << std::endl;
 
     if(leaf_buffer[0x61]->freq != 0x1) retval = 0x0;
     if(leaf_buffer[0x62]->freq != 0x1) retval = 0x0;
@@ -386,8 +344,6 @@ uchar test_symfreq_catalogue(){
          *(symbol_buffer+3) == 0x44 &&
          *(symbol_buffer+4) == 0x55)) retval = 0x0;
 
-    //printbp(symbol_buffer, 40);
-
     if(!(    *freq_buffer == 0x1 &&
          *(freq_buffer+1) == 0x1 &&
          *(freq_buffer+2) == 0x1 &&
@@ -423,12 +379,9 @@ uchar test_encodec(){//return 0x0;
     uchar* output_data = new uchar[input_len+0x1];
     size_t output_len = 0x0;
 
-    //std::cout << "Bef encodec call" << std::endl;
     encodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
-    //std::cout << "Aft encodec call" << std::endl;
 
     uchar retval = 0x1;
-    //std::cout << "Conditions" << std::endl;
     std::cout << "<output_len>" << output_len << "</output_len>" << std::endl;
     if(output_len != 0x2) retval = 0x0;
     else if(((*output_data) & 0xf8) != 0x18) retval = 0x0;
@@ -444,8 +397,6 @@ uchar test_encodec(){//return 0x0;
     delete[] output_data;
 
     /* TEST 2 */
-
-    //std::cout << "--Test 2--" << std::endl;
 
     input_data = new uchar[0x3];
     *input_data = 0x61;
@@ -467,12 +418,10 @@ uchar test_encodec(){//return 0x0;
     output_data = new uchar[input_len+0x1];
     output_len = 0x0;
     encodec(input_data, input_len, symbol_buffer, freq_buffer, n, output_data, output_len);
-    //std::cout << "Conditions (II)" << std::endl;
     if(output_len != 0x2) retval = 0x0;
     else if(((*output_data)&0xf8) != 0xb0) retval = 0x0;
     else if(*(output_data+1) != 0x5) retval = 0x0;
 
-    //std::cout << "output2" << std::endl;
     std::cout << "<output_len>" << output_len << "</output_len>" << std::endl;
     std::cout << "<output_data>" << std::endl;
     printbp(output_data, output_len*8);
@@ -516,11 +465,10 @@ uchar test_decodec(){//return 0x1;
     std::cout << "Aft decodec call" << std::endl;
 
     uchar retval = 0x1;
-    if(output_len != 0x3) retval = 0x0; //temp - really 3
+    if(output_len != 0x3) retval = 0x0;
     else if(*output_data != 0x44) retval = 0x0;
     else if(*(output_data+1) != 0x88) retval = 0x0;
     else if(*(output_data+2) != 0x66) retval = 0x0;
-    //else if(*(output_data+3) != 0x44) retval = 0x0; // temp
 
     std::cout << "Decoding output length: " << output_len;
     std::cout << "Decoding output data: ";
@@ -559,11 +507,10 @@ uchar test_decodec(){//return 0x1;
     std::cout << "Aft decodec call" << std::endl;
 
 
-    if(output_len != 0x3) retval = 0x0; //temp - really 3
+    if(output_len != 0x3) retval = 0x0;
     else if(*output_data != 0x61) retval = 0x0;
     else if(*(output_data+1) != 0x62) retval = 0x0;
     else if(*(output_data+2) != 0x63) retval = 0x0;
-    //else if(*(output_data+3) != 0x44) retval = 0x0; // temp
 
     std::cout << "Decoding output length: " << output_len;
     std::cout << "Decoding output data: ";
@@ -577,8 +524,6 @@ uchar test_decodec(){//return 0x1;
     return retval;
 }
 
-////uchar inject(uchar* dest, uint content, uchar content_len, uchar dest_offset)
-////size_t inject(uchar*& dest, const uint& content, const uchar& content_len, const uchar& dest_offset_in, uchar& dest_offset_out)
 //size_t inject(uchar*& dest, const uint& content, const uchar& content_len, uchar& dest_offset)
 uchar test_inject(){//return 0x1;
     /* V-TEST 1 */
@@ -636,8 +581,6 @@ uchar test_inject(){//return 0x1;
     std::cout << "RETINJ: " << (int)retinj << std::endl;
 
     delete[] buff;
-
-
     return retval;
 }
 

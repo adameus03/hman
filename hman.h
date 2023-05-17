@@ -30,18 +30,12 @@ typedef unsigned long long ull;
 typedef dnode* dxnode; //for decoding
 typedef enode* exnode; //for encoding
 
-//void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_buffer, ull* freq_buffer, uchar& uniq_symbol_cnt);
-
 dxnode* min_dxnode(dxnode* buffer, uchar len);
-
-//exnode* min_exnode(exnode* buffer, uchar len);
 
 uchar min_exnode(exnode* buffer, exnode*& minptr, uchar len);
 
 dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n);
 
 void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& n, exnode* leaf_buffer);
-
-
 
 #endif // HMAN_H_INCLUDED
