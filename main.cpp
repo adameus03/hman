@@ -8,6 +8,12 @@
 
 using namespace std;
 
+/**
+    @brief
+        Show usage of the program
+    @param argv0
+        The first argument passed to the program
+*/
 void usage(char* argv0){
     std::cout << "Usage:" << std::endl;
     std::cout << "Transmit file" << std::endl;
@@ -27,6 +33,14 @@ void usage(char* argv0){
     std::cout << std::endl;
 }
 
+/**
+    @brief
+        The entry point of the program
+    @param argc
+        Number of command line arguments passed
+    @param argv
+        The command line arguments buffer
+*/
 int main(int argc, char** argv)
 {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //green

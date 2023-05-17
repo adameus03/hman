@@ -14,6 +14,16 @@ typedef unsigned long long ull;
 typedef dnode* dxnode; //for decoding
 typedef enode* exnode; //for encoding
 
+/**
+    @brief
+        Find decoding node with minimal frequency
+    @param buffer
+        Length of decoding node buffer to be searched
+    @param _len
+        Length of the input buffer
+    @returns
+        The minimal frequency decoding node
+*/
 dxnode* min_dxnode(dxnode* buffer, uchar _len){
     ushort len = _len ? _len : 0x100; //
     dxnode* _min_dxnode = NULL;
@@ -41,6 +51,16 @@ dxnode* min_dxnode(dxnode* buffer, uchar _len){
     return _min_dxnode;
 }
 // return 0x1 if it is the only non-null exnode
+/**
+    @brief
+        Find decoding node with minimal frequency
+    @param buffer
+        Length of decoding node buffer to be searched
+    @param _len
+        Length of the input buffer
+    @returns
+        The minimal frequency encoding node
+*/
 uchar min_exnode(exnode* buffer, exnode*& minptr, uchar _len){
     ushort len = _len ? _len : 0x100; //
     exnode* _min_exnode = NULL;
@@ -75,9 +95,18 @@ uchar min_exnode(exnode* buffer, exnode*& minptr, uchar _len){
     return retval;
 }
 
-
-
-
+/**
+    @brief
+        Generate a Huffman decoding tree
+    @param symbol_buffer
+        Buffer of unique bytes occurring in cataloged data
+    @param freq_buffer
+        Buffer of frequencies of unique bytes occurring in cataloged data
+`   @param _n
+        Length of symbol_buffer
+    @returns
+        The root of the generated Huffman decoding tree
+*/
 dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& _n){
 
     /*
@@ -161,6 +190,18 @@ dnode hman_dtree(uchar* symbol_buffer, ull* freq_buffer, const uchar& _n){
     }
 }
 
+/**
+    @brief
+        Generate a Huffman encoding tree
+    @param symbol_buffer
+        Buffer of unique bytes occurring in cataloged data
+    @param freq_buffer
+        Buffer of frequencies of unique bytes occurring in cataloged data
+`   @param _n
+        Length of symbol_buffer
+    @param leaf_buffer
+        The outputted buffer of leaf nodes of the generated Huffman encoding tree
+*/
 void hman_etree(uchar* symbol_buffer, ull* freq_buffer, const uchar& _n, exnode* leaf_buffer){
     ushort n = _n ? _n : 0x100;
 

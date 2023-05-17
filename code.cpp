@@ -84,10 +84,12 @@ void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_bu
     @param content
         The data sequence to inject
     @param conten_len
-        Injection length
+        Injection length (in bits!)
     @param dest_offset
         Input: Offset of injection
         Output: Offset of first non-injected bit
+    @returns
+        The shift (measured in bytes) of the `dest` pointer
 */
 
 size_t inject(uchar*& dest, const uint& content, const uchar& content_len, uchar& dest_offset){

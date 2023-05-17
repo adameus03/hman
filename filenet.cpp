@@ -24,6 +24,16 @@ typedef unsigned long long ull;
 const size_t BLK_SIZE = 1024;
 //const uchar ACK = 0xa;
 
+/**
+    @brief
+        Transmit a file over TCP/IP
+    @param source_path
+        Path of the file to be sent
+    @param local_ip_addr
+        Local socket IPv4 address
+    @param local_port
+        Local socket port
+*/
 void transmit_file(const char* source_path, const char* local_ip_addr, const int& local_port){ // hman -t source_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
@@ -61,6 +71,16 @@ void transmit_file(const char* source_path, const char* local_ip_addr, const int
     WSACleanup();
 }
 
+/**
+    @brief
+        Receive a file over TCP/IP
+    @param dest_path
+        Destination path for the received file
+    @param remote_ip_addr
+        Remote socket IPv4 address
+    @param remote_port
+        Remote socket port
+*/
 void receive_file(const char* dest_path, const char* remote_ip_addr, const int& remote_port){ //hman -r dest_path ip_addr
     SOCKET s = get_socket_as_client(remote_ip_addr, remote_port);
     std::cout << "Socket_as client OK" << std::endl;

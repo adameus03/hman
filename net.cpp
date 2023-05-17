@@ -2,6 +2,14 @@
 #include <cstdlib>
 #include <winsock2.h>
 
+/**
+    @brief
+        Get a TCP/IP listening socket
+    @param local_ip_addr
+        Local socket IPv4 address
+    @param local_port
+        Local socket port
+*/
 SOCKET get_socket_as_server(const char* local_ip_addr, const int& local_port){
     WSADATA wsaData;
 
@@ -49,7 +57,14 @@ SOCKET get_socket_as_server(const char* local_ip_addr, const int& local_port){
     return mainSocket;
 }
 
-
+/**
+    @brief
+        Get a TCP/IP socket, which is connected to the server
+    @param remote_ip_addr
+        Remote socket IPv4 address
+    @param remote_port
+        Remote socket port
+*/
 SOCKET get_socket_as_client(const char* remote_ip_addr, const int& remote_port){
     WSADATA wsaData;
 
