@@ -14,6 +14,7 @@ typedef unsigned long long ull;
 /**
     @brief
         Symbol-frequency map function
+        Used to catalogue data by measuring symbol-frequency stats
     @param data_buffer
         Input data to catalogue
     @param data_len
@@ -73,6 +74,22 @@ void symfreq_catalogue(uchar* data_buffer, const ull& data_len, uchar* symbol_bu
 
 //returns dest shift
 // content_len - in bits!
+
+/**
+    @brief
+        Bit injection function
+    @param dest
+        Input: Pointer reference of injection destination byte
+        Output: first non-injected bit's byte pointer reference
+    @param content
+        The data sequence to inject
+    @param conten_len
+        Injection length
+    @param dest_offset
+        Input: Offset of injection
+        Output: Offset of first non-injected bit
+*/
+
 size_t inject(uchar*& dest, const uint& content, const uchar& content_len, uchar& dest_offset){
     // przesun content o 32-content_len w lewo
     // przesun content o 24+dest_offset w prawo
@@ -133,6 +150,25 @@ size_t inject(uchar*& dest, const uint& content, const uchar& content_len, uchar
     return dest_shift;
 }
 
+/**
+    @brief
+        Encode (Compress) data using cataloged symbol-frequency
+    @param input_data
+        Data buffer to encode
+    @param input_len
+        Input buffer bytelength
+    @param symbol_buffer
+        Buffer of unique bytes occurring in input_data
+    @param freq_buffer
+        Buffer of frequencies of unique bytes occurring in input_data
+    @param n
+        Length of symbol_buffer
+    @param output_data
+        Output buffer for compressed data
+    @param output_len
+        Resultant output buffer length
+*/
+
 void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len){
 
     exnode* leaf_buffer = new exnode[0x100];
@@ -180,6 +216,25 @@ void encodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, u
     ///</append output offset byte>
 
 }
+
+/**
+    @brief
+        Decode (Decompress) data using cataloged symbol-frequency
+    @param input_data
+        Data buffer to decode
+    @param input_len
+        Input buffer bytelength
+    @param symbol_buffer
+        Buffer of unique bytes occurring in input_data
+    @param freq_buffer
+        Buffer of frequencies of unique bytes occurring in input_data
+    @param n
+        Length of symbol_buffer
+    @param output_data
+        Output buffer for decompressed data
+    @param output_len
+        Resultant output buffer length
+*/
 
 void decodec(uchar* input_data, const size_t& input_len, uchar* symbol_buffer, ull* freq_buffer, const uchar& n, uchar* output_data, size_t& output_len){
 

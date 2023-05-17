@@ -12,6 +12,24 @@ typedef unsigned char uchar;
 typedef unsigned short ushort;
 
 
+/**
+    @brief
+        Store symbol-frequency catalogue
+    @param input_data
+        Data buffer to encode
+    @param input_len
+        Input buffer bytelength
+    @param symbol_buffer
+        Buffer of unique bytes occurring in input_data
+    @param freq_buffer
+        Buffer of frequencies of unique bytes occurring in input_data
+    @param n
+        Length of symbol_buffer
+    @param output_data
+        Output buffer for compressed data
+    @param output_len
+        Resultant output buffer length
+*/
 void store_symfreq(const char* dest_path, uchar* symbol_buffer, ull* freq_buffer, const uchar& _uniq_symbol_cnt){
     ushort uniq_symbol_cnt = _uniq_symbol_cnt ? _uniq_symbol_cnt : 0x100;
     ushort dbuff_size = 0x9*uniq_symbol_cnt+0x1;
