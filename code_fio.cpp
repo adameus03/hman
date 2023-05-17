@@ -15,20 +15,14 @@ typedef unsigned short ushort;
 /**
     @brief
         Store symbol-frequency catalogue
-    @param input_data
-        Data buffer to encode
-    @param input_len
-        Input buffer bytelength
+    @param dest_path
+        Destination file path
     @param symbol_buffer
-        Buffer of unique bytes occurring in input_data
+        Buffer of unique bytes occurring in cataloged data
     @param freq_buffer
-        Buffer of frequencies of unique bytes occurring in input_data
-    @param n
+        Buffer of frequencies of unique bytes occurring in cataloged data
+    @param uniq_symbol_cnt
         Length of symbol_buffer
-    @param output_data
-        Output buffer for compressed data
-    @param output_len
-        Resultant output buffer length
 */
 void store_symfreq(const char* dest_path, uchar* symbol_buffer, ull* freq_buffer, const uchar& _uniq_symbol_cnt){
     ushort uniq_symbol_cnt = _uniq_symbol_cnt ? _uniq_symbol_cnt : 0x100;
@@ -59,6 +53,16 @@ void store_symfreq(const char* dest_path, uchar* symbol_buffer, ull* freq_buffer
     delete[] dbuff;
 }
 
+/**
+    @brief
+        Store symbol-frequency catalogue
+    @param dest_path
+        Destination file path
+    @param data_buffer
+        Buffer of input data to catalogue
+    @param data_len
+        Length of data_buffer
+*/
 void store_symfreq(const char* dest_path, uchar* data_buffer, const size_t& data_len){
     uchar* symbol_buffer = new uchar[0x100];
     ull* freq_buffer = new ull[0x100];
@@ -67,6 +71,19 @@ void store_symfreq(const char* dest_path, uchar* data_buffer, const size_t& data
     store_symfreq(dest_path, symbol_buffer, freq_buffer, uniq_symbol_cnt);
 }
 
+/**
+    @brief
+        Load symbol-frequency catalogue from file
+    @param source_path
+        Path of source file containing the symbol and frequency buffers
+    @param symbol_buffer
+        Outputted symbol buffer
+    @param freq_buffer
+        Outputted frequency buffer
+    @param n
+        Length of outputted symbol buffer
+
+*/
 void load_symfreq(const char* source_path, uchar* symbol_buffer, ull* freq_buffer, uchar& n){
 
     std::ifstream f_in(source_path, std::ifstream::binary);
@@ -92,6 +109,16 @@ void load_symfreq(const char* source_path, uchar* symbol_buffer, ull* freq_buffe
     delete[] sbuff;
 }
 
+/**
+    @brief
+        Store data buffer in a file
+    @param dest_path
+        Path of destination file for data storage
+    @param data
+        The data buffer to store in the file
+    @param len
+        Length of the data buffer
+*/
 void store_data(const char* dest_path, uchar* data, const size_t& len){
     std::ofstream f_out(dest_path, std::ofstream::trunc|std::ofstream::binary);
     std::filebuf* f_out_pbuf = f_out.rdbuf();
@@ -99,6 +126,16 @@ void store_data(const char* dest_path, uchar* data, const size_t& len){
     f_out.close();
 }
 
+/**
+    @brief
+        Encode file into separate compression file and symbol-frequency catalog file
+    @param source_path
+        Path of input source file
+    @param dest_path
+        Path for output destination file for compressed data
+    @param symfreq_path
+        Path for symbol-frequency catalog file
+*/
 void encode_file_distinct(const char* source_path, const char* dest_path, const char* symfreq_path){ // hman -e source_path dest_path symfreq_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
@@ -126,6 +163,16 @@ void encode_file_distinct(const char* source_path, const char* dest_path, const 
     delete[] freq_buffer;
 }
 
+/**
+    @brief
+        Compress file using existing symbol-frequency catalog file
+    @param source_path
+        Path of input source file
+    @param dest_path
+        Path for output destination file for compressed data
+    @param symfreq_path
+        Path of existing symbol-frequency catalog file
+*/
 void encode_file_distinct_recycle(const char* source_path, const char* dest_path, const char* symfreq_path){ // hman -er source_path dest_path symfreq_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
@@ -151,6 +198,16 @@ void encode_file_distinct_recycle(const char* source_path, const char* dest_path
     delete[] freq_buffer;
 }
 
+/**
+    @brief
+        Decompress file using existing symbol-frequency catalog file
+    @param source_path
+        Path of input source file
+    @param dest_path
+        Path for output destination file for decompressed data
+    @param symfreq_path
+        Path of existing symbol-frequency catalog file
+*/
 void decode_file_distinct(const char* source_path, const char* dest_path, const char* symfreq_path){ // hman -d source_path dest_path symfreq_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
@@ -183,6 +240,14 @@ void decode_file_distinct(const char* source_path, const char* dest_path, const 
     delete[] freq_buffer;
 }
 
+/**
+    @brief
+        Encode file into single file containing both compressed data and symbol-frequency catalog
+    @param source_path
+        Path of input source file
+    @param dest_path
+        Path for output destination file for compressed data and symbol-frequency catalog
+*/
 void encode_file_compact(const char* source_path, const char* dest_path){ // hman -e source_path dest_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
@@ -226,6 +291,14 @@ void encode_file_compact(const char* source_path, const char* dest_path){ // hma
     store_data(dest_path, dbuff, 0x9*uniq_symbol_cnt_s+0x1+output_len);
 }
 
+/**
+    @brief
+        Decompress file using embedded symbol-frequency catalog
+    @param source_path
+        Path of input source file
+    @param dest_path
+        Path for output destination file for decompressed data
+*/
 void decode_file_compact(const char* source_path, const char* dest_path){ // hman -d source_path dest_path
     std::ifstream f_in(source_path, std::ifstream::binary);
     std::filebuf* f_in_pbuf = f_in.rdbuf();
